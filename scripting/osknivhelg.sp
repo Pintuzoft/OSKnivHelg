@@ -33,9 +33,9 @@ public void Event_RoundStart ( Event event, const char[] name, bool dontBroadcas
     PrintToChatAll ( "Event_RoundStart!" );
     int wins = ( GetTeamScore ( CS_TEAM_T ) + GetTeamScore ( CS_TEAM_CT ) );
     if ( wins < 1 ) {
-        PrintToChatAll ( " - FIRST ROUND!!!!!" );
+        PrintToChatAll ( " - FIRST ROUND!!!!!: %d", wins );
     } else {
-        PrintToChatAll ( " - ! FIRST ROUND!!!!!" );
+        PrintToChatAll ( " - ! FIRST ROUND!!!!!: %d", wins );
     }
 }
 public void Event_GameStart ( Event event, const char[] name, bool dontBroadcast ) {
