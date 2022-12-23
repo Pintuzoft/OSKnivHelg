@@ -4,7 +4,7 @@
 #include <cstrike>
 
 char error[255];
-Database knivhelg = null;
+Handle knivhelg = null;
 int adminPoints = 10;
 int userPoints = 5;
 
