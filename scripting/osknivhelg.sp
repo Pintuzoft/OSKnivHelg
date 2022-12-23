@@ -163,7 +163,10 @@ public void checkConnection ( ) {
 
 public void addAdmin ( char name[64], char authid[32] ) {
     DBStatement stmt = null;
-    stmt = SQL_PrepareQuery ( knivhelg, "insert into admin (name,authid) values (?,?)", error, sizeof(error) );
+    if ( ( stmt = SQL_PrepareQuery ( knivhelg, "insert into admin (name,authid) values (?,?)", error, sizeof(error) ) ) == null ) {
+        PrintToServer("[OSKnivHelg]: Failed to query[0x06] (error: %s)", error);
+        return;
+    }
     PrintToConsoleAll ( "[OSKnivHelg]: Adding admin: %s (steamid: %s)", name, authid );
     SQL_BindParamString ( stmt, 0, name, false );
     SQL_BindParamString ( stmt, 1, authid, false );
