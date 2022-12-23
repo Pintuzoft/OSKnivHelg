@@ -4,7 +4,7 @@
 #include <cstrike>
 
 char error[255];
-Database knivhelg;
+Database knivhelg = null;
 int adminPoints = 10;
 int userPoints = 5;
 
@@ -138,9 +138,7 @@ public void populateAdminTable ( ) {
     char name[64];
     char authid[32];
     DBStatement stmt = null;
-    if ( knivhelg == null ) {
-        databaseConnect ( );
-    }
+    checkConnection ( );
     cleanAdminTable ( );
     Database sourcebans = SQL_Connect ( "sourcebans", true, error, sizeof(error) );
     stmt = SQL_PrepareQuery ( sourcebans, "select user,authid from sb_admins where aid != 0", error, sizeof(error) );
@@ -155,6 +153,12 @@ public void populateAdminTable ( ) {
         CloseHandle ( stmt );
     }
     delete sourcebans;
+}
+
+public void checkConnection ( ) {
+    if ( knivhelg == null || knivhelg == INVALID_HANDLE ) {
+        databaseConnect ( );
+    }
 }
 
 public void addAdmin ( char name[64], char authid[32] ) {
