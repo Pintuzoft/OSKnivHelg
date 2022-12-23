@@ -97,11 +97,11 @@ public bool isValidSteamID ( char authid[32] ) {
 public void addKnifeEvent ( char attacker_name[64], char attacker_authid[32], char victim_name[64], char victim_authid[32], int points ) {
     databaseConnect ( )
     DBStatement stmt = SQL_PrepareQuery ( knivhelg, "insert into event (attacker,attackerid,victim,victimid,points) values (?,?,?,?,?)", error, sizeof(error) );
-    SQL_BindParamString ( stmt, 0, attacker_name, false );
-    SQL_BindParamString ( stmt, 1, attacker_authid, false );
-    SQL_BindParamString ( stmt, 2, victim_name, false );
-    SQL_BindParamString ( stmt, 3, victim_authid, false );
-    SQL_BindParamInt ( stmt, 4, points );
+    SQL_BindParamString ( stmt, 1, attacker_name, false );
+    SQL_BindParamString ( stmt, 2, attacker_authid, false );
+    SQL_BindParamString ( stmt, 3, victim_name, false );
+    SQL_BindParamString ( stmt, 4, victim_authid, false );
+    SQL_BindParamInt ( stmt, 5, points );
     if ( ! SQL_Execute ( stmt ) ) {
         SQL_GetError ( knivhelg, error, sizeof(error));
         PrintToServer("[OSKnivHelg]: Failed to query[0x04] (error: %s)", error);
