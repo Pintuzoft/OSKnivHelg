@@ -153,6 +153,7 @@ public void populateAdminTable ( ) {
 
 public void addAdmin ( char name[64], char authid[32] ) {
     DBStatement stmt = SQL_PrepareQuery ( knivhelg, "insert into admin (name,authid) values (?,?)", error, sizeof(error) );
+    PrintToConsoleAll ( "[OSKnivHelg]: Adding admin: %s (steamid: %s)", name, authid );
     SQL_BindParamString ( stmt, 0, name, false );
     SQL_BindParamString ( stmt, 1, authid, false );
     if ( ! SQL_Execute ( stmt ) ) {
