@@ -30,11 +30,17 @@ public void OnPluginStart ( ) {
 
 /* EVENTS */
 public void Event_RoundStart ( Event event, const char[] name, bool dontBroadcast ) {
-
+    PrintToChatAll ( "Event_RoundStart!" );
+    int wins = ( GetTeamScore ( CS_TEAM_T ) + GetTeamScore ( CS_TEAM_CT ) );
+    if ( wins < 1 ) {
+        PrintToChatAll ( " - FIRST ROUND!!!!!" );
+    } else {
+        PrintToChatAll ( " - ! FIRST ROUND!!!!!" );
+    }
 }
 public void Event_GameStart ( Event event, const char[] name, bool dontBroadcast ) {
-    PrintToChatAll ( "Event_GameStart!" );
     populateAdminTable ( );
+
 }
 public void Event_RoundEnd ( Event event, const char[] name, bool dontBroadcast ) {
     
