@@ -33,13 +33,13 @@ public void Event_RoundStart ( Event event, const char[] name, bool dontBroadcas
 }
 public void Event_RoundEnd ( Event event, const char[] name, bool dontBroadcast ) {
     PrintToChatAll ( "RoundEnd!" );
-    if ( ! isWarmup ( ) ) {
+    if ( isWarmup ( ) ) {
         populateAdminTable ( );
     }
 }
 
 public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadcast ) {
-    if ( ! isWarmup ( ) ) {
+    if ( isWarmup ( ) ) {
         return;
     }
     int victim_id = GetEventInt(event, "userid");
