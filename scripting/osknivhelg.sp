@@ -2,10 +2,8 @@
 #include <sdktools>
 #include <cstrike>
 
-
-
-//char error[255];
-//Database knivhelg;
+char error[255];
+Database knivhelg;
 
 public Plugin myinfo = {
 	name = "OSKnivHelg",
@@ -15,22 +13,24 @@ public Plugin myinfo = {
 	url = "https://github.com/Pintuzoft/OSKnivHelg"
 }
 
+
+
 public void OnPluginStart ( ) {
-//    HookEvent ( "round_start", Event_RoundStart );
+    HookEvent ( "round_start", Event_RoundStart );
 //    HookEvent ( "round_end", Event_RoundEnd );
-//    HookEvent ( "player_death", Event_PlayerDeath );
-//    databaseConnect ( );
-//    populateAdminTable ( );
-//    AutoExecConfig ( true, "osknivhelg" );
+    HookEvent ( "player_death", Event_PlayerDeath );
+    databaseConnect ( );
+    populateAdminTable ( );
+    AutoExecConfig ( true, "osknivhelg" );
 }
 
 
 /* EVENTS */
-//public void Event_RoundStart ( Event event, const char[] name, bool dontBroadcast ) {
+public void Event_RoundStart ( Event event, const char[] name, bool dontBroadcast ) {
 
-//}
+}
 
-/*public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadcast ) {
+public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadcast ) {
     if ( ! isWarmup ( ) ) {
         return;
     }
@@ -41,7 +41,7 @@ public void OnPluginStart ( ) {
 
     
     
-}*/
+}
 
 
 /* END of EVENTS */
@@ -49,12 +49,11 @@ public void OnPluginStart ( ) {
 
 /* METHODS */
 
-/*public void databaseConnect ( ) {
-    knivhelg = SQL_Connect ( "knivhelg", true, error, sizeof(error) );
-}*/
+public void databaseConnect ( ) {
+    //knivhelg = SQL_Connect ( "knivhelg", true, error, sizeof(error) );
+}
 
-/*public void populateAdminTable ( ) {
-    Handle query;
+public void populateAdminTable ( ) {
     char name[64];
     char authid[32];
     Database sourcebans = SQL_Connect ( "sourcebans", true, error, sizeof(error) );
@@ -63,25 +62,25 @@ public void OnPluginStart ( ) {
     while ( SQL_FetchRow ( stmt ) ) {
         SQL_FetchString ( stmt, 0, name, sizeof(name) );
         SQL_FetchString ( stmt, 1, authid, sizeof(authid) );
-        
+        PrintToChatAll ( "Found admin: %s (steamid: %s)", name, authid );
     }
     if ( stmt != null ) {
         CloseHandle ( stmt );
     }
     delete sourcebans;
-}*/
+}
 
 
 /* return true if player is real */
-/*public bool playerIsReal ( int player ) {
+public bool playerIsReal ( int player ) {
     return ( IsClientInGame ( player ) &&
              !IsClientSourceTV ( player ) );
-}*/
+}
 
 /* isWarmup */
-/*public bool isWarmup ( ) {
+public bool isWarmup ( ) {
     if ( GameRules_GetProp ( "m_bWarmupPeriod" ) == 1 ) {
         return true;
     } 
     return false;
-}*/
+}
