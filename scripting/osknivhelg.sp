@@ -5,6 +5,8 @@
 
 char error[255];
 Database knivhelg;
+int adminPoints = 10;
+int userPoints = 5;
 
 public Plugin myinfo = {
 	name = "OSKnivHelg",
@@ -14,13 +16,9 @@ public Plugin myinfo = {
 	url = "https://github.com/Pintuzoft/OSKnivHelg"
 }
 
-
-
 public void OnPluginStart ( ) {
     HookEvent ( "round_start", Event_RoundStart );
- //   HookEvent ( "round_end", Event_RoundEnd );
     HookEvent ( "player_death", Event_PlayerDeath );
-    HookEvent ( "game_start", Event_GameStart );
     databaseConnect ( );
     populateAdminTable ( );
     RegConsoleCmd ( "sm_admintable", Command_AdminTable );
@@ -34,23 +32,48 @@ public void Event_RoundStart ( Event event, const char[] name, bool dontBroadcas
         populateAdminTable ( );
     }
 }
-public void Event_GameStart ( Event event, const char[] name, bool dontBroadcast ) {
-    populateAdminTable ( );
 
-}
-  
 public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadcast ) {
-    if ( isWarmup ( ) ) {
-        PrintToChatAll ( "is warmup so no count!" );
-        return;
-    }
     int victim_id = GetEventInt(event, "userid");
     int attacker_id = GetEventInt(event, "attacker");
     int victim = GetClientOfUserId(victim_id);
     int attacker = GetClientOfUserId(attacker_id);
 
-    
-    
+    if ( ! playerIsReal ( victim ) || 
+         ! playerIsReal ( attacker ) ||
+         victim == attacker ) {
+        return;
+    }
+    char weapon[32];
+    GetEventString ( event, "weapon", weapon, sizeof(weapon) );
+
+    if ( ! StrContains ( weapon, "knife" ) ) {
+        return;
+    }
+    if ( isWarmup ( ) ) {
+        PrintToChatAll ( "[OSKnivHelg]: Its warmup so kill doesnt count!" );
+        return;
+    }
+    char victim_name[64];
+    char attacker_name[64];
+    char victim_authid[32];
+    char attacker_authid[32];
+    GetClientName ( victim, victim_name, sizeof ( victim_name ) );
+    GetClientName ( attacker, attacker_name, sizeof ( attacker_name ) );
+    GetClientAuthId ( victim, AuthId_Steam2, victim_authid, sizeof ( victim_authid ) );
+    GetClientAuthId ( attacker, AuthId_Steam2, attacker_authid, sizeof ( attacker_authid ) );
+
+    if ( ! isValidSteamID ( victim_authid ) || ! isValidSteamID ( attacker_authid ) ) {
+        return;
+    }
+
+    int points = userPoints;
+    if ( isAdmin ( attacker_authid ) || isAdmin ( victim_authid ) ) {
+        points = adminPoints;
+    }
+
+    addKnifeEvent ( attacker_name, attacker_authid, victim_name, victim_authid, points );
+    PrintToChatAll ( "[OSKnivHelg]: %s knifed %s and got %d points!", attacker_name, victim_name, points );
 }
 
 
@@ -66,10 +89,46 @@ public Action Command_AdminTable ( int client, int args ) {
 
 /* METHODS */
 
-public void databaseConnect ( ) {
-    //knivhelg = SQL_Connect ( "knivhelg", true, error, sizeof(error) );
+public bool isValidSteamID ( char authid[32] ) {
+    return ( StrContains ( authid, "STEAM_0" ) || StrContains ( authid, "STEAM_1" ) );
 }
 
+public void addKnifeEvent ( char attacker_name[64], char attacker_authid[32], char victim_name[64], char victim_authid[32], int points ) {
+    databaseConnect ( )
+    DBStatement stmt = SQL_PrepareQuery ( knivhelg, "insert into event (attacker_name,attacker_authid,victim_name,victim_authid,points) values (?,?,?,?,?)", error, sizeof(error) );
+    SQL_BindParamString ( stmt, 0, attacker_name, false );
+    SQL_BindParamString ( stmt, 1, attacker_authid, false );
+    SQL_BindParamString ( stmt, 2, victim_name, false );
+    SQL_BindParamString ( stmt, 3, victim_authid, false );
+    SQL_BindParamInt ( stmt, 4, points );
+    if ( ! SQL_Execute ( stmt ) ) {
+        SQL_GetError ( knivhelg, error, sizeof(error));
+        PrintToServer("[OSKnivHelg]: Failed to query[0x04] (error: %s)", error);
+    }
+    delete stmt;
+}
+
+public bool isAdmin ( char authid[32] ) {
+    databaseConnect ( )
+    DBStatement stmt = SQL_PrepareQuery ( knivhelg, "select count(*) from admin where authid = ?", error, sizeof(error) );
+    SQL_BindParamString ( stmt, 0, authid, false );
+    if ( ! SQL_Execute ( stmt ) ) {
+        SQL_GetError ( knivhelg, error, sizeof(error));
+        PrintToServer("[OSKnivHelg]: Failed to query[0x03] (error: %s)", error);
+    }
+    int count = 0;
+    if ( SQL_FetchRow ( stmt ) ) {
+        count = SQL_FetchInt ( stmt, 0 );
+    }
+    delete stmt;
+    return ( count > 0 );
+}
+
+public void databaseConnect ( ) {
+    knivhelg = SQL_Connect ( "knivhelg", true, error, sizeof(error) );
+}
+
+/* read admins from sourcebans and put them into knivhelg */
 public void populateAdminTable ( ) {
     char name[64];
     char authid[32];
@@ -83,7 +142,7 @@ public void populateAdminTable ( ) {
     while ( SQL_FetchRow ( stmt ) ) {
         SQL_FetchString ( stmt, 0, name, sizeof(name) );
         SQL_FetchString ( stmt, 1, authid, sizeof(authid) );
-        PrintToConsoleAll ( "Found admin: %s (steamid: %s)", name, authid );
+        PrintToConsoleAll ( "[OSKnivHelg]: Found admin: %s (steamid: %s)", name, authid );
         addAdmin ( name, authid );
     }
     if ( stmt != null ) {
@@ -98,7 +157,7 @@ public void addAdmin ( char name[64], char authid[32] ) {
     SQL_BindParamString ( stmt, 1, authid, false );
     if ( ! SQL_Execute ( stmt ) ) {
         SQL_GetError ( knivhelg, error, sizeof(error));
-        PrintToServer("Failed to query[0x01] (error: %s)", error);
+        PrintToServer("[OSKnivHelg]: Failed to query[0x01] (error: %s)", error);
     }
     delete stmt;    
 }
@@ -106,7 +165,7 @@ public void addAdmin ( char name[64], char authid[32] ) {
 public void cleanAdminTable ( ) {
     if ( ! SQL_FastQuery ( knivhelg, "delete from admin" ) ) {
         SQL_GetError ( knivhelg, error, sizeof(error));
-        PrintToServer("Failed to query[0x02] (error: %s)", error);
+        PrintToServer("[OSKnivHelg]: Failed to query[0x02] (error: %s)", error);
     }
 }
 
