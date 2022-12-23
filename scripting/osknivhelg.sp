@@ -40,6 +40,7 @@ public void Event_RoundEnd ( Event event, const char[] name, bool dontBroadcast 
 
 public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadcast ) {
     if ( isWarmup ( ) ) {
+        PrintToChatAll ( "is warmup so no count!" );
         return;
     }
     int victim_id = GetEventInt(event, "userid");
