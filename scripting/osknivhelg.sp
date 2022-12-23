@@ -32,6 +32,7 @@ public void Event_RoundStart ( Event event, const char[] name, bool dontBroadcas
 
 }
 public void Event_RoundEnd ( Event event, const char[] name, bool dontBroadcast ) {
+    PrintToChatAll ( "RoundEnd!" );
     if ( ! isWarmup ( ) ) {
         populateAdminTable ( );
     }
