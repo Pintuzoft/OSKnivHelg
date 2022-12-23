@@ -4,7 +4,7 @@
 #include <cstrike>
 
 char error[255];
-Handle knivhelg;
+Database knivhelg;
 int adminPoints = 10;
 int userPoints = 5;
 
@@ -132,12 +132,13 @@ public void databaseConnect ( ) {
 public void populateAdminTable ( ) {
     char name[64];
     char authid[32];
+    DBStatement stmt = null;
     if ( knivhelg == null ) {
         databaseConnect ( );
     }
     cleanAdminTable ( );
     Database sourcebans = SQL_Connect ( "sourcebans", true, error, sizeof(error) );
-    DBStatement stmt = SQL_PrepareQuery ( sourcebans, "select user,authid from sb_admins where aid != 0", error, sizeof(error) );
+    stmt = SQL_PrepareQuery ( sourcebans, "select user,authid from sb_admins where aid != 0", error, sizeof(error) );
     SQL_Execute ( stmt );
     while ( SQL_FetchRow ( stmt ) ) {
         SQL_FetchString ( stmt, 0, name, sizeof(name) );
@@ -152,10 +153,8 @@ public void populateAdminTable ( ) {
 }
 
 public void addAdmin ( char name[64], char authid[32] ) {
-    if ( knivhelg == INVALID_HANDLE ) {
-        databaseConnect ( );
-    }
-    DBStatement stmt = SQL_PrepareQuery ( knivhelg, "insert into admin (name,authid) values (?,?)", error, sizeof(error) );
+    DBStatement stmt = null;
+    stmt = SQL_PrepareQuery ( knivhelg, "insert into admin (name,authid) values (?,?)", error, sizeof(error) );
     PrintToConsoleAll ( "[OSKnivHelg]: Adding admin: %s (steamid: %s)", name, authid );
     SQL_BindParamString ( stmt, 0, name, false );
     SQL_BindParamString ( stmt, 1, authid, false );
@@ -163,7 +162,9 @@ public void addAdmin ( char name[64], char authid[32] ) {
         SQL_GetError ( knivhelg, error, sizeof(error));
         PrintToServer("[OSKnivHelg]: Failed to query[0x01] (error: %s)", error);
     }
-    delete stmt;    
+    if ( stmt != null ) {
+        CloseHandle ( stmt );
+    }    
 }
 
 public void cleanAdminTable ( ) {
