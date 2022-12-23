@@ -18,7 +18,7 @@ public Plugin myinfo = {
 
 public void OnPluginStart ( ) {
     HookEvent ( "round_start", Event_RoundStart );
-    HookEvent ( "round_end", Event_RoundEnd );
+ //   HookEvent ( "round_end", Event_RoundEnd );
     HookEvent ( "player_death", Event_PlayerDeath );
     HookEvent ( "game_start", Event_GameStart );
     databaseConnect ( );
@@ -30,24 +30,15 @@ public void OnPluginStart ( ) {
 
 /* EVENTS */
 public void Event_RoundStart ( Event event, const char[] name, bool dontBroadcast ) {
-    PrintToChatAll ( "Event_RoundStart!" );
-    int wins = ( GetTeamScore ( CS_TEAM_T ) + GetTeamScore ( CS_TEAM_CT ) );
-    if ( wins < 1 ) {
-        PrintToChatAll ( " - FIRST ROUND!!!!!: %d", wins );
-    } else {
-        PrintToChatAll ( " - ! FIRST ROUND!!!!!: %d", wins );
+    if ( isFirstRound ( ) ) {
+        populateAdminTable ( );
     }
 }
 public void Event_GameStart ( Event event, const char[] name, bool dontBroadcast ) {
     populateAdminTable ( );
 
 }
-public void Event_RoundEnd ( Event event, const char[] name, bool dontBroadcast ) {
-    
-    //    populateAdminTable ( );
-    
-}
-
+  
 public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadcast ) {
     if ( isWarmup ( ) ) {
         PrintToChatAll ( "is warmup so no count!" );
@@ -109,4 +100,8 @@ public bool isWarmup ( ) {
         return true;
     } 
     return false;
+}
+
+public bool isFirstRound ( ) {
+    return ( ( GetTeamScore ( CS_TEAM_T ) + GetTeamScore ( CS_TEAM_CT ) ) <= 0 );
 }
