@@ -1,5 +1,6 @@
 #include <sourcemod>
 #include <sdktools>
+#include <sdktools_gamerules>
 #include <cstrike>
 
 char error[255];
