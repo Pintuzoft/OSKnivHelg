@@ -112,7 +112,7 @@ public void addKnifeEvent ( char attacker_name[64], char attacker_authid[32], ch
 public bool isAdmin ( char authid[32] ) {
     databaseConnect ( )
     DBStatement stmt = SQL_PrepareQuery ( knivhelg, "select count(*) from admin where authid = ?", error, sizeof(error) );
-    SQL_BindParamString ( stmt, 0, authid, false );
+    SQL_BindParamString ( stmt, 1, authid, false );
     if ( ! SQL_Execute ( stmt ) ) {
         SQL_GetError ( knivhelg, error, sizeof(error));
         PrintToServer("[OSKnivHelg]: Failed to query[0x03] (error: %s)", error);
