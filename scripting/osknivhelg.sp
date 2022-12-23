@@ -2,8 +2,8 @@
 #include <sdktools>
 #include <cstrike>
 
-char error[255];
-Database knivhelg;
+//char error[255];
+//Database knivhelg;
 
 public Plugin myinfo = {
 	name = "OSKnivHelg",
@@ -14,21 +14,21 @@ public Plugin myinfo = {
 }
 
 public void OnPluginStart ( ) {
-    HookEvent ( "round_start", Event_RoundStart );
-    HookEvent ( "round_end", Event_RoundEnd );
-    HookEvent ( "player_death", Event_PlayerDeath );
-    databaseConnect ( );
-    populateAdminTable ( );
-    AutoExecConfig ( true, "osknivhelg" );
+//    HookEvent ( "round_start", Event_RoundStart );
+//    HookEvent ( "round_end", Event_RoundEnd );
+//    HookEvent ( "player_death", Event_PlayerDeath );
+//    databaseConnect ( );
+//    populateAdminTable ( );
+//    AutoExecConfig ( true, "osknivhelg" );
 }
 
 
 /* EVENTS */
-public void Event_RoundStart ( Event event, const char[] name, bool dontBroadcast ) {
+//public void Event_RoundStart ( Event event, const char[] name, bool dontBroadcast ) {
 
-}
+//}
 
-public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadcast ) {
+/*public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadcast ) {
     if ( ! isWarmup ( ) ) {
         return;
     }
@@ -39,7 +39,7 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
 
     
     
-}
+}*/
 
 
 /* END of EVENTS */
@@ -47,11 +47,11 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
 
 /* METHODS */
 
-public void databaseConnect ( ) {
+/*public void databaseConnect ( ) {
     knivhelg = SQL_Connect ( "knivhelg", true, error, sizeof(error) );
-}
+}*/
 
-public void populateAdminTable ( ) {
+/*public void populateAdminTable ( ) {
     Handle query;
     char name[64];
     char authid[32];
@@ -67,19 +67,19 @@ public void populateAdminTable ( ) {
         CloseHandle ( stmt );
     }
     delete sourcebans;
-}
+}*/
 
 
 /* return true if player is real */
-public bool playerIsReal ( int player ) {
+/*public bool playerIsReal ( int player ) {
     return ( IsClientInGame ( player ) &&
              !IsClientSourceTV ( player ) );
-}
+}*/
 
 /* isWarmup */
-public bool isWarmup ( ) {
+/*public bool isWarmup ( ) {
     if ( GameRules_GetProp ( "m_bWarmupPeriod" ) == 1 ) {
         return true;
     } 
     return false;
-}
+}*/
