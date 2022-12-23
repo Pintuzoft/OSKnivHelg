@@ -21,7 +21,7 @@ public void OnPluginStart ( ) {
     HookEvent ( "player_death", Event_PlayerDeath );
     databaseConnect ( );
     populateAdminTable ( );
-    RegConsoleCmd ( "sm_admintable", populateAdminTable, "Test populate admins" );
+    RegConsoleCmd ( "sm_at", populateAdminTable, "Test populate admins" );
     AutoExecConfig ( true, "osknivhelg" );
 }
 
@@ -57,17 +57,28 @@ public void databaseConnect ( ) {
 public void populateAdminTable ( ) {
     char name[64];
     char authid[32];
+    PrintToConsoleAll ( "0:" );
     Database sourcebans = SQL_Connect ( "sourcebans", true, error, sizeof(error) );
+    PrintToConsoleAll ( "1:" );
     DBStatement stmt = SQL_PrepareQuery ( sourcebans, "select user,authid from sb_admins where aid != 0", error, sizeof(error) );
+    PrintToConsoleAll ( "2:" );
     SQL_Execute ( stmt );
+    PrintToConsoleAll ( "3:" );
     while ( SQL_FetchRow ( stmt ) ) {
+    PrintToConsoleAll ( "4:" );
         SQL_FetchString ( stmt, 0, name, sizeof(name) );
+    PrintToConsoleAll ( "5:" );
         SQL_FetchString ( stmt, 1, authid, sizeof(authid) );
+    PrintToConsoleAll ( "6:" );
         PrintToChatAll ( "Found admin: %s (steamid: %s)", name, authid );
+    PrintToConsoleAll ( "7:" );
     }
+    PrintToConsoleAll ( "8:" );
     if ( stmt != null ) {
+    PrintToConsoleAll ( "9:" );
         CloseHandle ( stmt );
     }
+    PrintToConsoleAll ( "10:" );
     delete sourcebans;
 }
 
