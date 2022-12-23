@@ -49,6 +49,7 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
 
 /* COMMANDS*/
 public Action Command_AdminTable ( int client, int args ) {
+    PrintToConsoleAll ( "Command_AdminTable!" )
     populateAdminTable ( );
     return Plugin_Handled;
 }
