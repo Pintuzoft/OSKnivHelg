@@ -20,6 +20,7 @@ public void OnPluginStart ( ) {
     HookEvent ( "round_start", Event_RoundStart );
     HookEvent ( "round_end", Event_RoundEnd );
     HookEvent ( "player_death", Event_PlayerDeath );
+    HookEvent ( "game_start", Event_GameStart );
     databaseConnect ( );
     populateAdminTable ( );
     RegConsoleCmd ( "sm_admintable", Command_AdminTable );
@@ -31,11 +32,14 @@ public void OnPluginStart ( ) {
 public void Event_RoundStart ( Event event, const char[] name, bool dontBroadcast ) {
 
 }
+public void Event_GameStart ( Event event, const char[] name, bool dontBroadcast ) {
+    PrintToChatAll ( "Event_GameStart!" );
+    populateAdminTable ( );
+}
 public void Event_RoundEnd ( Event event, const char[] name, bool dontBroadcast ) {
-    PrintToChatAll ( "RoundEnd!" );
-    if ( isWarmup ( ) ) {
-        populateAdminTable ( );
-    }
+    
+    //    populateAdminTable ( );
+    
 }
 
 public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadcast ) {
