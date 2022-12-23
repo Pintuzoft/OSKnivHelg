@@ -21,7 +21,7 @@ public void OnPluginStart ( ) {
     HookEvent ( "player_death", Event_PlayerDeath );
     databaseConnect ( );
     populateAdminTable ( );
-    RegConsoleCmd ( "sm_admintable", populateAdminTable );
+    RegConsoleCmd ( "sm_admintable", Command_AdminTable );
     AutoExecConfig ( true, "osknivhelg" );
 }
 
@@ -46,6 +46,12 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
 
 
 /* END of EVENTS */
+
+/* COMMANDS*/
+public Action Command_AdminTable ( int client, int args ) {
+    populateAdminTable ( );
+    return Plugin_Handled;
+}
 
 
 /* METHODS */
