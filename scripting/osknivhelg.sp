@@ -4,7 +4,7 @@
 #include <cstrike>
 
 char error[255];
-Database knivhelg;
+Handle knivhelg;
 int adminPoints = 10;
 int userPoints = 5;
 
@@ -152,6 +152,9 @@ public void populateAdminTable ( ) {
 }
 
 public void addAdmin ( char name[64], char authid[32] ) {
+    if ( knivhelg == INVALID_HANDLE ) {
+        databaseConnect ( );
+    }
     DBStatement stmt = SQL_PrepareQuery ( knivhelg, "insert into admin (name,authid) values (?,?)", error, sizeof(error) );
     PrintToConsoleAll ( "[OSKnivHelg]: Adding admin: %s (steamid: %s)", name, authid );
     SQL_BindParamString ( stmt, 0, name, false );
