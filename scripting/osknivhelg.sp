@@ -51,7 +51,7 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
         return;
     }
     if ( isWarmup ( ) ) {
-        PrintToChatAll ( "[OSKnivHelg]: Its warmup so kill doesnt count!" );
+        PrintToChatAll ( "[OSKnivHelg]: Its warmup so knife doesnt count!" );
         return;
     }
     char victim_name[64];
@@ -90,7 +90,8 @@ public Action Command_AdminTable ( int client, int args ) {
 /* METHODS */
 
 public bool isValidSteamID ( char authid[32] ) {
-    return ( StrContains ( authid, "STEAM_0" ) || StrContains ( authid, "STEAM_1" ) );
+    return true;
+//    return ( StrContains ( authid, "STEAM_0" ) || StrContains ( authid, "STEAM_1" ) );
 }
 
 public void addKnifeEvent ( char attacker_name[64], char attacker_authid[32], char victim_name[64], char victim_authid[32], int points ) {
@@ -125,7 +126,11 @@ public bool isAdmin ( char authid[32] ) {
 }
 
 public void databaseConnect ( ) {
-    knivhelg = SQL_Connect ( "knivhelg", true, error, sizeof(error) );
+    if ( ( knivhelg = SQL_Connect ( "knivhelg", true, error, sizeof(error) ) ) != null ) {
+        PrintToServer ( "[OSKnivHelg]: Connected to knivhelg database!" );
+    } else {
+        PrintToServer ( "[OSKnivHelg]: Failed to connect to knivhelg database! (error: %s)", error );
+    }
 }
 
 /* read admins from sourcebans and put them into knivhelg */
