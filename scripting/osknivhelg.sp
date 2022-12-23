@@ -73,6 +73,10 @@ public void databaseConnect ( ) {
 public void populateAdminTable ( ) {
     char name[64];
     char authid[32];
+    if ( knivhelg == null ) {
+        databaseConnect ( );
+    }
+    cleanAdminTable ( );
     Database sourcebans = SQL_Connect ( "sourcebans", true, error, sizeof(error) );
     DBStatement stmt = SQL_PrepareQuery ( sourcebans, "select user,authid from sb_admins where aid != 0", error, sizeof(error) );
     SQL_Execute ( stmt );
@@ -80,6 +84,7 @@ public void populateAdminTable ( ) {
         SQL_FetchString ( stmt, 0, name, sizeof(name) );
         SQL_FetchString ( stmt, 1, authid, sizeof(authid) );
         PrintToConsoleAll ( "Found admin: %s (steamid: %s)", name, authid );
+        addAdmin ( name, authid );
     }
     if ( stmt != null ) {
         CloseHandle ( stmt );
@@ -87,6 +92,23 @@ public void populateAdminTable ( ) {
     delete sourcebans;
 }
 
+public void addAdmin ( char name[64], char authid[32] ) {
+    DBStatement stmt = SQL_PrepareQuery ( knivhelg, "insert into admin (name,authid) values (?,?)", error, sizeof(error) );
+    SQL_BindParamString ( stmt, 1, name, false );
+    SQL_BindParamString ( stmt, 2, authid, false );
+    if ( ! SQL_Execute ( stmt ) ) {
+        SQL_GetError ( knivhelg, error, sizeof(error));
+        PrintToServer("Failed to query[0x01] (error: %s)", error);
+    }
+    delete stmt;    
+}
+
+public void cleanAdminTable ( ) {
+    if ( ! SQL_FastQuery ( knivhelg, "delete from admin" ) ) {
+        SQL_GetError ( knivhelg, error, sizeof(error));
+        PrintToServer("Failed to query[0x02] (error: %s)", error);
+    }
+}
 
 /* return true if player is real */
 public bool playerIsReal ( int player ) {
