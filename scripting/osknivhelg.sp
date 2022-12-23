@@ -2,25 +2,27 @@
 #include <sdktools>
 #include <cstrike>
 
+
+
 //char error[255];
 //Database knivhelg;
 
-public Plugin myinfo = {
-	name = "OSKnivHelg",
-	author = "Pintuz",
-	description = "OldSwedes Kniva en admin helg plugin",
-	version = "0.01",
-	url = "https://github.com/Pintuzoft/OSKnivHelg"
-}
+//public Plugin myinfo = {
+//	name = "OSKnivHelg",
+//	author = "Pintuz",
+//	description = "OldSwedes Kniva en admin helg plugin",
+//	version = "0.01",
+//	url = "https://github.com/Pintuzoft/OSKnivHelg"
+//}
 
-public void OnPluginStart ( ) {
+//public void OnPluginStart ( ) {
 //    HookEvent ( "round_start", Event_RoundStart );
 //    HookEvent ( "round_end", Event_RoundEnd );
 //    HookEvent ( "player_death", Event_PlayerDeath );
 //    databaseConnect ( );
 //    populateAdminTable ( );
 //    AutoExecConfig ( true, "osknivhelg" );
-}
+//}
 
 
 /* EVENTS */

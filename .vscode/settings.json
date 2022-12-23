@@ -1,6 +1,0 @@
-{
-    "sourcepawn.MainPath": "/workspaces/OSKnivHelg/scripting/osknivhelg.sp",
-    "sourcepawn.SourcemodHome": "/home/codespace/sourcemodAPI/addons/sourcemod/scripting/include",
-    "sourcepawn.SpcompPath": "/home/codespace/sourcemodAPI/addons/sourcemod/scripting/spcomp",
-    "sourcepawn.enableLinter": true
-}
