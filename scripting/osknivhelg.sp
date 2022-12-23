@@ -61,7 +61,7 @@ public void populateAdminTable ( ) {
     while ( SQL_FetchRow ( stmt ) ) {
         SQL_FetchString ( stmt, 0, name, sizeof(name) );
         SQL_FetchString ( stmt, 1, authid, sizeof(authid) );
-        Pr
+        
     }
     if ( stmt != null ) {
         CloseHandle ( stmt );
