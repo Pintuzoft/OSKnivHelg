@@ -94,8 +94,8 @@ public void populateAdminTable ( ) {
 
 public void addAdmin ( char name[64], char authid[32] ) {
     DBStatement stmt = SQL_PrepareQuery ( knivhelg, "insert into admin (name,authid) values (?,?)", error, sizeof(error) );
-    SQL_BindParamString ( stmt, 1, name, false );
-    SQL_BindParamString ( stmt, 2, authid, false );
+    SQL_BindParamString ( stmt, 0, name, false );
+    SQL_BindParamString ( stmt, 1, authid, false );
     if ( ! SQL_Execute ( stmt ) ) {
         SQL_GetError ( knivhelg, error, sizeof(error));
         PrintToServer("Failed to query[0x01] (error: %s)", error);
