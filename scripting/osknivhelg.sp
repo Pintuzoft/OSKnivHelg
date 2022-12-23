@@ -21,6 +21,7 @@ public void OnPluginStart ( ) {
     HookEvent ( "player_death", Event_PlayerDeath );
     databaseConnect ( );
     populateAdminTable ( );
+    RegConsoleCmd ( "sm_admintable", populateAdminTable, "Test populate admins" );
     AutoExecConfig ( true, "osknivhelg" );
 }
 
