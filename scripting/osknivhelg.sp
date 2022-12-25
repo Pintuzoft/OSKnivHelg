@@ -50,7 +50,7 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
     GetEventString ( event, "weapon", weapon, sizeof(weapon) );
 
     if ( ! StrContains ( weapon, "knife", false ) ) {
-        PrintToConsoleAll ( "Event_PlayerDeath: not knife!" );
+        PrintToConsoleAll ( "Event_PlayerDeath: not knife: %s", weapon );
         return;
     }
     if ( isWarmup ( ) ) {
