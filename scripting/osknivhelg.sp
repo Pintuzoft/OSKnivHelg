@@ -39,31 +39,25 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
     int victim = GetClientOfUserId(victim_id);
     int attacker = GetClientOfUserId(attacker_id);
 
-    PrintToConsoleAll ( "Event_PlayerDeath!" );
     if ( ! playerIsReal ( victim ) || 
          ! playerIsReal ( attacker ) ||
          victim == attacker ) {
-        PrintToConsoleAll ( "Event_PlayerDeath: not real!" );
         return;
     }
     char weapon[32];
     GetEventString ( event, "weapon", weapon, sizeof(weapon) );
 
     if ( ! stringContains ( weapon, "KNIFE" ) ){
-        PrintToConsoleAll ( "Event_PlayerDeath: not knife: %s", weapon );
         return;
     }
     if ( isWarmup ( ) ) {
         PrintToChatAll ( "[OSKnivHelg]: Its warmup so knife doesnt count!" );
-        PrintToConsoleAll ( "Event_PlayerDeath: warmup!" );
-
         return;
     }
     char victim_name[64];
     char attacker_name[64];
     char victim_authid[32];
     char attacker_authid[32];
-    PrintToConsoleAll ( "Event_PlayerDeath: Here!" );
     GetClientName ( victim, victim_name, sizeof ( victim_name ) );
     GetClientName ( attacker, attacker_name, sizeof ( attacker_name ) );
     GetClientAuthId ( victim, AuthId_Steam2, victim_authid, sizeof ( victim_authid ) );
@@ -77,7 +71,6 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
     if ( isAdmin ( attacker_authid ) || isAdmin ( victim_authid ) ) {
         points = adminPoints;
     }
-    PrintToConsoleAll ( "Event_PlayerDeath: Here2" );
     addKnifeEvent ( attacker_name, attacker_authid, victim_name, victim_authid, points );
     PrintToChatAll ( "[OSKnivHelg]: %s knifed %s and got %d points!", attacker_name, victim_name, points );
 }
@@ -87,7 +80,6 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
 
 /* COMMANDS*/
 public Action Command_AdminTable ( int client, int args ) {
-    PrintToConsoleAll ( "Command_AdminTable!" )
     populateAdminTable ( );
     return Plugin_Handled;
 }
@@ -106,13 +98,6 @@ public bool isValidSteamID ( char authid[32] ) {
 
 public void addKnifeEvent ( char attacker_name[64], char attacker_authid[32], char victim_name[64], char victim_authid[32], int points ) {
     databaseConnect ( )
-    PrintToConsoleAll ( "addKnifeEvent:" );
-    PrintToConsoleAll ( " - attacker: %s", attacker_name );
-    PrintToConsoleAll ( " - attacker_authid: %s", attacker_authid );
-    PrintToConsoleAll ( " - victim: %s", victim_name );
-    PrintToConsoleAll ( " - victim_authid: %s", victim_authid );
-    PrintToConsoleAll ( " - points: %d", points );
-    
     DBStatement stmt;
     if ( ( stmt = SQL_PrepareQuery ( knivhelg, "insert into event (attacker,attackerid,victim,victimid,points) values (?,?,?,?,?)", error, sizeof(error) ) ) == null ) {
         SQL_GetError ( knivhelg, error, sizeof(error));
@@ -134,7 +119,7 @@ public void addKnifeEvent ( char attacker_name[64], char attacker_authid[32], ch
 public bool isAdmin ( char authid[32] ) {
     databaseConnect ( )
     DBStatement stmt;
-    if ( ( stmt = SQL_PrepareQuery ( knivhelg, "select count(*) from admin where authid = ?", error, sizeof(error) ) ) == null ) {
+    if ( ( stmt = SQL_PrepareQuery ( knivhelg, "select count(*) from admin where steamid = ?", error, sizeof(error) ) ) == null ) {
         SQL_GetError ( knivhelg, error, sizeof(error));
         PrintToServer("[OSKnivHelg]: Failed to prepare query[0x08] (error: %s)", error);
         return false;
