@@ -39,25 +39,31 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
     int victim = GetClientOfUserId(victim_id);
     int attacker = GetClientOfUserId(attacker_id);
 
+    PrintToConsoleAll ( "Event_PlayerDeath!" );
     if ( ! playerIsReal ( victim ) || 
          ! playerIsReal ( attacker ) ||
          victim == attacker ) {
+            PrintToConsoleAll ( "Event_PlayerDeath: not real!" );
         return;
     }
     char weapon[32];
     GetEventString ( event, "weapon", weapon, sizeof(weapon) );
 
     if ( ! StrContains ( weapon, "knife", false ) ) {
+        PrintToConsoleAll ( "Event_PlayerDeath: not knife!" );
         return;
     }
     if ( isWarmup ( ) ) {
         PrintToChatAll ( "[OSKnivHelg]: Its warmup so knife doesnt count!" );
+        PrintToConsoleAll ( "Event_PlayerDeath: warmup!" );
+
         return;
     }
     char victim_name[64];
     char attacker_name[64];
     char victim_authid[32];
     char attacker_authid[32];
+    PrintToConsoleAll ( "Event_PlayerDeath: Here!" );
     GetClientName ( victim, victim_name, sizeof ( victim_name ) );
     GetClientName ( attacker, attacker_name, sizeof ( attacker_name ) );
     GetClientAuthId ( victim, AuthId_Steam2, victim_authid, sizeof ( victim_authid ) );
@@ -71,7 +77,7 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
     if ( isAdmin ( attacker_authid ) || isAdmin ( victim_authid ) ) {
         points = adminPoints;
     }
-
+    PrintToConsoleAll ( "Event_PlayerDeath: Here2" );
     addKnifeEvent ( attacker_name, attacker_authid, victim_name, victim_authid, points );
     PrintToChatAll ( "[OSKnivHelg]: %s knifed %s and got %d points!", attacker_name, victim_name, points );
 }
