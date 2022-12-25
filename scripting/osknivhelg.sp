@@ -43,13 +43,13 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
     if ( ! playerIsReal ( victim ) || 
          ! playerIsReal ( attacker ) ||
          victim == attacker ) {
-            PrintToConsoleAll ( "Event_PlayerDeath: not real!" );
+        PrintToConsoleAll ( "Event_PlayerDeath: not real!" );
         return;
     }
     char weapon[32];
     GetEventString ( event, "weapon", weapon, sizeof(weapon) );
 
-    if ( ! StrContains ( weapon, "knife", false ) ) {
+    if ( stringMatch ( weapon, "KNIFE" ) ){
         PrintToConsoleAll ( "Event_PlayerDeath: not knife: %s", weapon );
         return;
     }
@@ -94,6 +94,10 @@ public Action Command_AdminTable ( int client, int args ) {
 
 
 /* METHODS */
+
+public bool stringMatch ( char string[32], char match[32] ) {
+    return ( StrContains ( string, match, false ) != -1 );
+}
 
 public bool isValidSteamID ( char authid[32] ) {
     return true;
