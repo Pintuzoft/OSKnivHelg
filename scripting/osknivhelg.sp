@@ -96,6 +96,13 @@ public bool isValidSteamID ( char authid[32] ) {
 
 public void addKnifeEvent ( char attacker_name[64], char attacker_authid[32], char victim_name[64], char victim_authid[32], int points ) {
     databaseConnect ( )
+    PrintToConsoleAll ( "addKnifeEvent:" );
+    PrintToConsoleAll ( " - attacker: %s", attacker_name );
+    PrintToConsoleAll ( " - attacker_authid: %s", attacker_authid );
+    PrintToConsoleAll ( " - victim: %s", victim_name );
+    PrintToConsoleAll ( " - victim_authid: %s", victim_authid );
+    PrintToConsoleAll ( " - points: %d", points );
+    
     DBStatement stmt;
     if ( ( stmt = SQL_PrepareQuery ( knivhelg, "insert into event (attacker,attackerid,victim,victimid,points) values (?,?,?,?,?)", error, sizeof(error) ) ) == null ) {
         SQL_GetError ( knivhelg, error, sizeof(error));
