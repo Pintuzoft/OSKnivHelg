@@ -49,7 +49,7 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
     char weapon[32];
     GetEventString ( event, "weapon", weapon, sizeof(weapon) );
 
-    if ( stringMatch ( weapon, "KNIFE" ) ){
+    if ( ! stringContains ( weapon, "KNIFE" ) ){
         PrintToConsoleAll ( "Event_PlayerDeath: not knife: %s", weapon );
         return;
     }
@@ -95,7 +95,7 @@ public Action Command_AdminTable ( int client, int args ) {
 
 /* METHODS */
 
-public bool stringMatch ( char string[32], char match[32] ) {
+public bool stringContains ( char string[32], char match[32] ) {
     return ( StrContains ( string, match, false ) != -1 );
 }
 
