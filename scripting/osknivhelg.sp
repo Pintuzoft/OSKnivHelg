@@ -63,9 +63,9 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
     GetClientAuthId ( victim, AuthId_Steam2, victim_authid, sizeof ( victim_authid ) );
     GetClientAuthId ( attacker, AuthId_Steam2, attacker_authid, sizeof ( attacker_authid ) );
 
-    if ( ! isValidSteamID ( victim_authid ) || ! isValidSteamID ( attacker_authid ) ) {
-        return;
-    }
+    //if ( ! isValidSteamID ( victim_authid ) || ! isValidSteamID ( attacker_authid ) ) {
+    //    return;
+    //}
 
     int points = userPoints;
     if ( isAdmin ( attacker_authid ) || isAdmin ( victim_authid ) ) {
