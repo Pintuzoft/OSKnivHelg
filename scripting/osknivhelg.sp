@@ -168,7 +168,7 @@ public void populateAdminTable ( ) {
     checkConnection ( );
     cleanAdminTable ( );
     Database sourcebans = SQL_Connect ( "sourcebans", true, error, sizeof(error) );
-    stmt = SQL_PrepareQuery ( sourcebans, "select user,authid from sb_admins where aid != 0", error, sizeof(error) );
+    stmt = SQL_PrepareQuery ( sourcebans, "select user,replace(authid,'STEAM_0','STEAM_1') from sb_admins where aid != 0", error, sizeof(error) );
     SQL_Execute ( stmt );
     while ( SQL_FetchRow ( stmt ) ) {
         SQL_FetchString ( stmt, 0, name, sizeof(name) );
