@@ -99,7 +99,7 @@ public bool isValidSteamID ( char authid[32] ) {
 public void addKnifeEvent ( char attacker_name[64], char attacker_authid[32], char victim_name[64], char victim_authid[32], int points ) {
     databaseConnect ( )
     DBStatement stmt;
-    if ( ( stmt = SQL_PrepareQuery ( knivhelg, "insert into event (attacker,attackerid,victim,victimid,points) values (?,?,?,?,?)", error, sizeof(error) ) ) == null ) {
+    if ( ( stmt = SQL_PrepareQuery ( knivhelg, "insert into event (stamp,attacker,attackerid,victim,victimid,points) values (now(),?,?,?,?,?)", error, sizeof(error) ) ) == null ) {
         SQL_GetError ( knivhelg, error, sizeof(error));
         PrintToServer("[OSKnivHelg]: Failed to prepare query[0x07] (error: %s)", error);
         return;
