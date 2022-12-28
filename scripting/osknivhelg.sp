@@ -16,6 +16,7 @@ public Plugin myinfo = {
 
 public void OnPluginStart ( ) {
     HookEvent ( "player_death", Event_PlayerDeath );
+    RegConsoleCmd ( "sm_ktop", Command_KnifeTop, "Shows the top 10 knife kills" );
     databaseConnect ( );
     AutoExecConfig ( true, "osknivhelg" );
 }
@@ -54,9 +55,9 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
     GetClientAuthId ( attacker, AuthId_Steam2, attacker_authid, sizeof ( attacker_authid ) );
     int points = getPoints ( attacker_authid, victim_authid );
     
-    //if ( ! isValidSteamID ( victim_authid ) || ! isValidSteamID ( attacker_authid ) ) {
-    //    return;
-    //}
+    if ( ! isValidSteamID ( victim_authid ) || ! isValidSteamID ( attacker_authid ) ) {
+        return;
+    }
 
     addKnifeEvent ( attacker_name, attacker_authid, victim_name, victim_authid, points );
     PrintToChatAll ( "[OSKnivHelg]: %s knifed %s and got %d points!", attacker_name, victim_name, points );
@@ -66,7 +67,34 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
 /* END of EVENTS */
 
 /* COMMANDS*/
+public Action Command_KnifeTop ( int client, int args ) {
+    databaseConnect ( );
+    DBStatement stmt;
+    char name[64];
+    int points;
+    int i;
+    if ( ( stmt = SQL_PrepareQuery ( knivhelg, "select name,points from userstats order by points desc limit 10;", error, sizeof(error) ) ) == null ) {
+        SQL_GetError ( knivhelg, error, sizeof(error));
+        PrintToServer("[OSKnivHelg]: Failed to prepare query[0x05] (error: %s)", error);
+        return Plugin_Handled;
+    }
 
+    if ( ! SQL_Execute ( stmt ) ) {
+        SQL_GetError ( knivhelg, error, sizeof(error));
+        PrintToServer("[OSKnivHelg]: Failed to query[0x06] (error: %s)", error);
+        return Plugin_Handled;
+    }
+
+    PrintToChat ( client, "Top 10 knife kills:" );
+    i = 1;
+    while ( SQL_FetchRow ( stmt ) ) {
+        SQL_FetchString ( stmt, 0, name, sizeof(name) );
+        points = SQL_FetchInt ( stmt, 1 );
+        PrintToChat ( client, " #%d. %s - %d", i, name, points );
+        i++;
+    }
+    return Plugin_Handled;
+}
 
 /* METHODS */
  
@@ -79,7 +107,7 @@ public int getPoints ( char attacker_authid[32], char victim_authid[32] ) {
     
     if ( ( stmt = SQL_PrepareQuery ( knivhelg, "select ifnull((select points from user where steamid = ?),1) as apoints,ifnull((select points from user where steamid = ?),1) as vpoints;", error, sizeof(error) ) ) == null ) {
         SQL_GetError ( knivhelg, error, sizeof(error));
-        PrintToServer("[OSKnivHelg]: Failed to prepare query[0x01] (error: %s)", error);
+        PrintToServer("[OSKnivHelg]: Failed to prepare query[0x03] (error: %s)", error);
         return 0;
     }
     SQL_BindParamString ( stmt, 0, attacker_authid, false );
@@ -87,7 +115,7 @@ public int getPoints ( char attacker_authid[32], char victim_authid[32] ) {
 
     if ( ! SQL_Execute ( stmt ) ) {
         SQL_GetError ( knivhelg, error, sizeof(error));
-        PrintToServer("[OSKnivHelg]: Failed to query[0x01] (error: %s)", error);
+        PrintToServer("[OSKnivHelg]: Failed to query[0x04] (error: %s)", error);
         return 0;
     }
     if ( SQL_FetchRow ( stmt ) ) {
@@ -123,7 +151,7 @@ public void addKnifeEvent ( char attacker_name[64], char attacker_authid[32], ch
     DBStatement stmt;
     if ( ( stmt = SQL_PrepareQuery ( knivhelg, "insert into event (stamp,attacker,attackerid,victim,victimid,points) values (now(),?,?,?,?,?)", error, sizeof(error) ) ) == null ) {
         SQL_GetError ( knivhelg, error, sizeof(error));
-        PrintToServer("[OSKnivHelg]: Failed to prepare query[0x07] (error: %s)", error);
+        PrintToServer("[OSKnivHelg]: Failed to prepare query[0x01] (error: %s)", error);
         return;
     }
     SQL_BindParamString ( stmt, 0, attacker_name, false );
@@ -133,7 +161,7 @@ public void addKnifeEvent ( char attacker_name[64], char attacker_authid[32], ch
     SQL_BindParamInt ( stmt, 4, points );
     if ( ! SQL_Execute ( stmt ) ) {
         SQL_GetError ( knivhelg, error, sizeof(error));
-        PrintToServer("[OSKnivHelg]: Failed to query[0x04] (error: %s)", error);
+        PrintToServer("[OSKnivHelg]: Failed to query[0x02] (error: %s)", error);
     }
     delete stmt;
 }
