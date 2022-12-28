@@ -49,15 +49,17 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
     char attacker_name[64];
     char victim_authid[32];
     char attacker_authid[32];
+    int points;
     GetClientName ( victim, victim_name, sizeof ( victim_name ) );
     GetClientName ( attacker, attacker_name, sizeof ( attacker_name ) );
     GetClientAuthId ( victim, AuthId_Steam2, victim_authid, sizeof ( victim_authid ) );
     GetClientAuthId ( attacker, AuthId_Steam2, attacker_authid, sizeof ( attacker_authid ) );
-    int points = getPoints ( attacker_authid, victim_authid );
     
     if ( ! isValidSteamID ( victim_authid ) || ! isValidSteamID ( attacker_authid ) ) {
         return;
     }
+    
+    points = getPoints ( attacker_authid, victim_authid );
 
     addKnifeEvent ( attacker_name, attacker_authid, victim_name, victim_authid, points );
     PrintToChatAll ( "[OSKnivHelg]: %s knifed %s and got %d points!", attacker_name, victim_name, points );
@@ -136,14 +138,13 @@ public int getPoints ( char attacker_authid[32], char victim_authid[32] ) {
     }
 
 }
- 
+
 public bool stringContains ( char string[32], char match[32] ) {
     return ( StrContains ( string, match, false ) != -1 );
 }
 
 public bool isValidSteamID ( char authid[32] ) {
-    return true;
-//    return ( StrContains ( authid, "STEAM_0" ) || StrContains ( authid, "STEAM_1" ) );
+    return ( StrContains ( authid, "STEAM_0" ) || StrContains ( authid, "STEAM_1" ) );
 }
 
 public void addKnifeEvent ( char attacker_name[64], char attacker_authid[32], char victim_name[64], char victim_authid[32], int points ) {
