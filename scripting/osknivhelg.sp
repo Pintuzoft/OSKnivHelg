@@ -50,6 +50,7 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
     if ( ! stringContains ( weapon, "KNIFE" ) ){
         return;
     }
+
     if ( isWarmup ( ) ) {
         PrintToChatAll ( "[OSKnivHelg]: Its warmup so knife doesnt count!" );
         return;
@@ -60,9 +61,9 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
     GetClientAuthId ( victim, AuthId_Steam2, victim_authid, sizeof ( victim_authid ) );
     GetClientAuthId ( attacker, AuthId_Steam2, attacker_authid, sizeof ( attacker_authid ) );
     
-    if ( ! isValidSteamID ( victim_authid ) || ! isValidSteamID ( attacker_authid ) ) {
-        return;
-    }
+    //if ( ! isValidSteamID ( victim_authid ) || ! isValidSteamID ( attacker_authid ) ) {
+    //    return;
+    //}
 
     isAttackerAdmin = isPlayerAdmin ( attacker_authid );
     isVictimAdmin = isPlayerAdmin ( attacker_authid );
@@ -72,7 +73,7 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
     fixPoints ( attacker_name, attacker_authid, true, isAdmin );
     fixPoints ( victim_name, victim_authid, false, isAdmin );
 
-    PrintToChatAll ( " \x04[OSKnivHelg]: %s%s knifed %s%s and got %d points!", 
+    PrintToChatAll ( " \x02[OSKnivHelg]: %s%s knifed %s%s and got %d points!", 
                     attacker_name, 
                     (isAttackerAdmin?" (admin)":""), 
                     victim_name, 
@@ -233,8 +234,9 @@ public void checkConnection ( ) {
  
 /* return true if player is real */
 public bool playerIsReal ( int player ) {
-    return ( IsClientInGame ( player ) &&
-             ! IsClientSourceTV ( player ) );
+    return true;
+//    return ( IsClientInGame ( player ) &&
+//             ! IsClientSourceTV ( player ) );
 }
 
 /* isWarmup */
