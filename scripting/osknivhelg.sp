@@ -72,14 +72,16 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
     addKnifeEvent ( attacker_name, attacker_authid, victim_name, victim_authid, isAdmin );
     fixPoints ( attacker_name, attacker_authid, true, isAdmin );
     fixPoints ( victim_name, victim_authid, false, isAdmin );
-
-    PrintToChatAll ( " \x02[OSKnivHelg]: %s%s knifed %s%s and got %d points!", 
-                    attacker_name, 
-                    (isAttackerAdmin?" (admin)":""), 
-                    victim_name, 
-                    (isVictimAdmin?" (admin)":""), 
-                    (isAdmin?10:5));
-
+    
+    if ( isAttackerAdmin && isVictimAdmin ) {
+        PrintToChatAll ( " \x02[OSKnivHelg]: %s (admin) knifed %s (admin) and got %d points!", attacker_name, victim_name, (isAdmin?10:5));
+    } else if ( isAttackerAdmin ) {
+        PrintToChatAll ( " \x02[OSKnivHelg]: %s (admin) knifed %s and got %d points!", attacker_name, victim_name, (isAdmin?10:5));
+    } else if ( isVictimAdmin ) {
+        PrintToChatAll ( " \x02[OSKnivHelg]: %s knifed %s (admin) and got %d points!", attacker_name, victim_name, (isAdmin?10:5));
+    } else {
+        PrintToChatAll ( " \x02[OSKnivHelg]: %s knifed %s and got %d points!", attacker_name, victim_name, (isAdmin?10:5));
+    }
 }
 
 public void Event_PlayerConnect ( Event event, const char[] name, bool dontBroadcast ) {
