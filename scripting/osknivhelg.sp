@@ -16,7 +16,6 @@ public Plugin myinfo = {
 
 public void OnPluginStart ( ) {
     HookEvent ( "player_death", Event_PlayerDeath );
-    HookEvent ( "player_connect", Event_PlayerConnect );
     RegConsoleCmd ( "sm_ktop", Command_KnifeTop, "Shows the top 10 knife kills" );
     databaseConnect ( );
     AutoExecConfig ( true, "osknivhelg" );
@@ -84,20 +83,6 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
     }
 }
 
-public void Event_PlayerConnect ( Event event, const char[] name, bool dontBroadcast ) {
-    int user_id = GetEventInt(event, "userid");
-    char steamid[32];
-
-    if ( ! playerIsReal ( user_id ) ) {
-        return;
-    }
-
-    GetClientAuthId ( user_id, AuthId_Steam2, steamid, sizeof ( steamid ) );
-    if ( ! isValidSteamID ( steamid ) ) {
-        return;
-    }
-    PrintToChat ( user_id, " \x04[OSKnivHelg]: Welcome to OldSwedes KnivHelg! Knifing an admin gives you 10 points, knifing a normal player gives you 5 points. Type !ktop to see the top 10 knifers!" );    
-}
 
 /* END of EVENTS */
 
