@@ -65,7 +65,7 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
     }
 
     isAttackerAdmin = isPlayerAdmin ( attacker_authid );
-    isVictimAdmin = isPlayerAdmin ( attacker_authid );
+    isVictimAdmin = isPlayerAdmin ( victim_authid );
     isAdmin = ( isAttackerAdmin || isVictimAdmin );
 
     addKnifeEvent ( attacker_name, attacker_authid, victim_name, victim_authid, isAdmin );
@@ -150,23 +150,17 @@ public bool isPlayerAdmin ( char authid[32] ) {
     checkConnection ();
     DBStatement stmt;
     int acount;
-    PrintToConsoleAll ( "Checking if %s is admin", authid );
     if ( ( stmt = SQL_PrepareQuery ( knivhelg, "select count(*) as acount from admin where replace(steamid,'STEAM_0','STEAM_1') = replace(?,'STEAM_0','STEAM_1');", error, sizeof(error) ) ) == null ) {   
-PrintToConsoleAll ( "0:false" );
         SQL_GetError ( knivhelg, error, sizeof(error));
         PrintToServer("[OSKnivHelg]: Failed to prepare query[0x05] (error: %s)", error);
         return false;
     }
 
-    PrintToConsoleAll ( "1:" );
-
     SQL_BindParamString ( stmt, 0, authid, false );
 
     if ( ! SQL_Execute ( stmt ) ) {
-    PrintToConsoleAll ( "2:" );
         SQL_GetError ( knivhelg, error, sizeof(error));
         PrintToServer("[OSKnivHelg]: Failed to query[0x06] (error: %s)", error);
-    PrintToConsoleAll ( "3:false" );
         return false;
     }
     if ( SQL_FetchRow ( stmt ) ) {
@@ -178,10 +172,8 @@ PrintToConsoleAll ( "0:false" );
     }
 
     if ( acount > 0 ) {
-    PrintToConsoleAll ( "4:true" );
         return true;
     }
-    PrintToConsoleAll ( "5:false" );
     return false;
 }
  
