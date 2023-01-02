@@ -163,17 +163,23 @@ public bool isPlayerAdmin ( char authid[32] ) {
     checkConnection ();
     DBStatement stmt;
     int acount;
-    
-    if ( ( stmt = SQL_PrepareQuery ( knivhelg, "select count(*) as acount from admin where replace(steamid,'STEAM_0','STEAM_1') = replace(?,'STEAM_0','STEAM_1');", error, sizeof(error) ) ) == null ) {
+    PrintToConsoleAll ( "Checking if %s is admin", authid );
+    if ( ( stmt = SQL_PrepareQuery ( knivhelg, "select count(*) as acount from admin where replace(steamid,'STEAM_0','STEAM_1') = replace(?,'STEAM_0','STEAM_1');", error, sizeof(error) ) ) == null ) {   
+PrintToConsoleAll ( "0:false" );
         SQL_GetError ( knivhelg, error, sizeof(error));
         PrintToServer("[OSKnivHelg]: Failed to prepare query[0x05] (error: %s)", error);
         return false;
     }
+
+    PrintToConsoleAll ( "1:" );
+
     SQL_BindParamString ( stmt, 0, authid, false );
 
     if ( ! SQL_Execute ( stmt ) ) {
+    PrintToConsoleAll ( "2:" );
         SQL_GetError ( knivhelg, error, sizeof(error));
         PrintToServer("[OSKnivHelg]: Failed to query[0x06] (error: %s)", error);
+    PrintToConsoleAll ( "3:false" );
         return false;
     }
     if ( SQL_FetchRow ( stmt ) ) {
@@ -185,8 +191,10 @@ public bool isPlayerAdmin ( char authid[32] ) {
     }
 
     if ( acount > 0 ) {
+    PrintToConsoleAll ( "4:true" );
         return true;
     }
+    PrintToConsoleAll ( "5:false" );
     return false;
 }
  
@@ -198,9 +206,10 @@ public bool isValidSteamID ( char authid[32] ) {
     return ( StrContains ( authid, "STEAM_0" ) || StrContains ( authid, "STEAM_1" ) );
 }
 
-public void addKnifeEvent ( char attacker_name[64], char attacker_authid[32], char victim_name[64], char victim_authid[32], int points ) {
+public void addKnifeEvent ( char attacker_name[64], char attacker_authid[32], char victim_name[64], char victim_authid[32], int isAdmin ) {
     databaseConnect ( )
     DBStatement stmt;
+    int points = (isAdmin?10:5);
     if ( ( stmt = SQL_PrepareQuery ( knivhelg, "insert into event (stamp,attacker,attackerid,victim,victimid,points) values (now(),?,?,?,?,?)", error, sizeof(error) ) ) == null ) {
         SQL_GetError ( knivhelg, error, sizeof(error) );
         PrintToServer("[OSKnivHelg]: Failed to prepare query[0x01] (error: %s)", error);
