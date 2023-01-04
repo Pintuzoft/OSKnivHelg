@@ -152,7 +152,7 @@ public void fetchAdminStr ( ) {
         SQL_GetError ( knivhelg, error, sizeof(error));
         PrintToServer("[OSKnivHelg]: Failed to prepare query[0x11] (error: %s)", error);
     } else {
-        if ( SQL_FetchString ( stmt, 0, adminstr, sizeof(adminstr) ) < 0 ) {
+        if ( SQL_FetchString ( stmt, 1, adminstr, sizeof(adminstr) ) < 0 ) {
             SQL_GetError ( knivhelg, error, sizeof(error));
             PrintToServer("[OSKnivHelg]: Failed to prepare query[0x12] (error: %s)", error);
         } else {
