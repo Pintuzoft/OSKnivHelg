@@ -137,7 +137,7 @@ public Action Command_KnifeTop ( int client, int args ) {
 public void fetchAdminStr ( ) {
     char buf[1024];
     DBStatement stmt;
-    if ( ( stmt = SQL_PrepareQuery ( knivhelg, "select GROUP_CONCAT(DISTINCT steamid SEPARATOR ';') as adminstr from admin;", error, sizeof(error) ) ) == null ) {
+    if ( ( stmt = SQL_PrepareQuery ( knivhelg, "select GROUP_CONCAT(DISTINCT steamid SEPARATOR ';') from admin;", error, sizeof(error) ) ) == null ) {
         SQL_GetError ( knivhelg, error, sizeof(error));
         PrintToServer("[OSKnivHelg]: Failed to prepare query[0x09] (error: %s)", error);
         return;
