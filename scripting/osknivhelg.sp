@@ -198,15 +198,12 @@ public bool stringContains ( char string[32], char match[32] ) {
 }
 
 public bool isValidSteamID ( char authid[32] ) {
-    if ( strcmp ( authid, "BOT" ) == 0 ) {
-        return false;
-    } else if   ( StrContains ( authid, "STEAM_0", false ) ) {
+    if ( StrContains ( authid, "STEAM_0", false ) ) {
         return true;
     } else if ( StrContains ( authid, "STEAM_1", false ) ) {
         return true;
-    } else {
-        return false;
     }
+    return false;
 }
 
 public void addKnifeEvent ( char attacker_name[64], char attacker_authid[32], char victim_name[64], char victim_authid[32], int isAdmin ) {
