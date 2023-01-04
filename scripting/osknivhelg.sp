@@ -138,19 +138,22 @@ public void fetchAdminStr ( ) {
     DBStatement stmt;
     if ( ( stmt = SQL_PrepareQuery ( knivhelg, "select GROUP_CONCAT(DISTINCT steamid SEPARATOR ';') as adminstr from admin;", error, sizeof(error) ) ) == null ) {
         SQL_GetError ( knivhelg, error, sizeof(error));
-        PrintToServer("[OSKnivHelg]: Failed to prepare query[0x07] (error: %s)", error);
+        PrintToServer("[OSKnivHelg]: Failed to prepare query[0x09] (error: %s)", error);
         return;
     }
 
     if ( ! SQL_Execute ( stmt ) ) {
         SQL_GetError ( knivhelg, error, sizeof(error));
-        PrintToServer("[OSKnivHelg]: Failed to query[0x08] (error: %s)", error);
+        PrintToServer("[OSKnivHelg]: Failed to query[0x10] (error: %s)", error);
         return;
     }
 
-    if ( SQL_FetchRow ( stmt ) ) {
+    if ( ! SQL_FetchRow ( stmt ) ) {
+        SQL_GetError ( knivhelg, error, sizeof(error));
+        PrintToServer("[OSKnivHelg]: Failed to prepare query[0x11] (error: %s)", error);
+    } else {
         SQL_FetchString ( stmt, 0, adminstr, sizeof(adminstr) );
-    }
+    } 
 
     if ( stmt != null ) {
         delete stmt;
