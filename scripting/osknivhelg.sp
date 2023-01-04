@@ -198,11 +198,15 @@ public bool stringContains ( char string[32], char match[32] ) {
 }
 
 public bool isValidSteamID ( char authid[32] ) {
+    PrintToServer ( "[OSKnivHelg]: isValidSteamID: %s", authid );
     if ( StrContains ( authid, "STEAM_0", false ) ) {
+        PrintToServer ( "[OSKnivHelg]: - 1: %s", authid );
         return true;
     } else if ( StrContains ( authid, "STEAM_1", false ) ) {
+        PrintToServer ( "[OSKnivHelg]: - 2: %s", authid );
         return true;
     }
+    PrintToServer ( "[OSKnivHelg]: - 3: %s", authid );
     return false;
 }
 
