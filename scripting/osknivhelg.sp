@@ -115,16 +115,16 @@ public Action Command_KnifeTop ( int client, int args ) {
     if ( ! isValidSteamID ( steamid ) ) {
         steamid = "STEAM_9:9:9";
     }
-    PrintToChat ( client, " \x04[OSKnivHelg]: Leaderboard:" );
+    PrintToChat ( client, " \x05[OSKnivHelg]: Leaderboard:" );
     i = 1;
     while ( SQL_FetchRow ( stmt ) ) {
         SQL_FetchString ( stmt, 0, name, sizeof(name) );
         SQL_FetchString ( stmt, 1, sid, sizeof(sid) );
         points = SQL_FetchInt ( stmt, 2 );
         if ( StrContains ( steamid, sid, false ) ) {
-            PrintToChat ( client, "  \x04%d. %s - %d", i, name, points );
-        } else {
             PrintToChat ( client, "  \x05%d. %s - %d", i, name, points );
+        } else {
+            PrintToChat ( client, "  \x04%d. %s - %d", i, name, points );
         }
         i++;
     }
