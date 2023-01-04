@@ -190,6 +190,8 @@ public void fixPoints ( char name[64], char authid[32], bool isAttacker, bool is
 
 public bool isPlayerAdmin ( char authid[32] ) {
     ReplaceString ( authid, sizeof(authid), "STEAM_0", "STEAM_1" );
+    PrintToServer ( "[OSKnivHelg]: isPlayerAdmin: %s", authid );
+    PrintToServer ( "[OSKnivHelg]: - : %s", adminstr );
     return ( StrContains ( adminstr, authid, false ) != -1 );
 }
  
