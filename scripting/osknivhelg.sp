@@ -3,6 +3,7 @@
 #include <sdktools_gamerules>
 #include <cstrike>
 
+char adminstr[1024];
 char error[255];
 Handle knivhelg = null;
 
@@ -17,10 +18,13 @@ public Plugin myinfo = {
 public void OnPluginStart ( ) {
     HookEvent ( "player_death", Event_PlayerDeath );
     RegConsoleCmd ( "sm_ktop", Command_KnifeTop, "Shows the top 10 knife kills" );
-    databaseConnect ( );
     AutoExecConfig ( true, "osknivhelg" );
 }
 
+public void OnMapStart ( ) {
+    checkConnection ( );
+    fetchAdminStr ( );
+}
 
 /* EVENTS */
  
@@ -88,12 +92,14 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
 
 /* COMMANDS*/
 public Action Command_KnifeTop ( int client, int args ) {
-    databaseConnect ( );
+    checkConnection ( );
     DBStatement stmt;
     char name[64];
+    char steamid[32];
+    char sid[32];
     int points;
     int i;
-    if ( ( stmt = SQL_PrepareQuery ( knivhelg, "select name,points from userstats order by points desc limit 10;", error, sizeof(error) ) ) == null ) {
+    if ( ( stmt = SQL_PrepareQuery ( knivhelg, "select name,steamid,points from userstats order by points desc limit 10;", error, sizeof(error) ) ) == null ) {
         SQL_GetError ( knivhelg, error, sizeof(error));
         PrintToServer("[OSKnivHelg]: Failed to prepare query[0x07] (error: %s)", error);
         return Plugin_Handled;
@@ -105,19 +111,52 @@ public Action Command_KnifeTop ( int client, int args ) {
         return Plugin_Handled;
     }
 
-    PrintToChat ( client, " \x02[OSKnivHelg]: Leaderboard:" );
+    GetClientAuthId ( client, AuthId_Steam2, steamid, sizeof ( steamid ) );
+    if ( ! isValidSteamID ( steamid ) ) {
+        steamid = "STEAM_9:9:9";
+    }
+    PrintToChat ( client, " \x04[OSKnivHelg]: Leaderboard:" );
     i = 1;
     while ( SQL_FetchRow ( stmt ) ) {
         SQL_FetchString ( stmt, 0, name, sizeof(name) );
-        points = SQL_FetchInt ( stmt, 1 );
-        PrintToChat ( client, "  \x02#%d. %s - %d", i, name, points );
+        SQL_FetchString ( stmt, 1, sid, sizeof(sid) );
+        points = SQL_FetchInt ( stmt, 2 );
+        if ( StrContains ( steamid, sid, false ) ) {
+            PrintToChat ( client, "  \x04%d. %s - %d", i, name, points );
+        } else {
+            PrintToChat ( client, "  \x05%d. %s - %d", i, name, points );
+        }
         i++;
     }
+    PrintToChatAll ( " \x04[OSKnivHelg]: adminstr: %s", adminstr );
     return Plugin_Handled;
 }
 
 /* METHODS */
  
+public void fetchAdminStr ( ) {
+    DBStatement stmt;
+    if ( ( stmt = SQL_PrepareQuery ( knivhelg, "select GROUP_CONCAT(DISTINCT steamid SEPARATOR ';') as adminstr from admin;", error, sizeof(error) ) ) == null ) {
+        SQL_GetError ( knivhelg, error, sizeof(error));
+        PrintToServer("[OSKnivHelg]: Failed to prepare query[0x07] (error: %s)", error);
+        return;
+    }
+
+    if ( ! SQL_Execute ( stmt ) ) {
+        SQL_GetError ( knivhelg, error, sizeof(error));
+        PrintToServer("[OSKnivHelg]: Failed to query[0x08] (error: %s)", error);
+        return;
+    }
+
+    if ( SQL_FetchRow ( stmt ) ) {
+        SQL_FetchString ( stmt, 0, adminstr, sizeof(adminstr) );
+    }
+
+    if ( stmt != null ) {
+        delete stmt;
+    }
+}
+
 public void fixPoints ( char name[64], char authid[32], bool isAttacker, bool isAdmin ) {
     checkConnection ();
     char query[255];
@@ -147,34 +186,7 @@ public void fixPoints ( char name[64], char authid[32], bool isAttacker, bool is
 }
 
 public bool isPlayerAdmin ( char authid[32] ) {
-    checkConnection ();
-    DBStatement stmt;
-    int acount;
-    if ( ( stmt = SQL_PrepareQuery ( knivhelg, "select count(*) as acount from admin where replace(steamid,'STEAM_0','STEAM_1') = replace(?,'STEAM_0','STEAM_1');", error, sizeof(error) ) ) == null ) {   
-        SQL_GetError ( knivhelg, error, sizeof(error));
-        PrintToServer("[OSKnivHelg]: Failed to prepare query[0x05] (error: %s)", error);
-        return false;
-    }
-
-    SQL_BindParamString ( stmt, 0, authid, false );
-
-    if ( ! SQL_Execute ( stmt ) ) {
-        SQL_GetError ( knivhelg, error, sizeof(error));
-        PrintToServer("[OSKnivHelg]: Failed to query[0x06] (error: %s)", error);
-        return false;
-    }
-    if ( SQL_FetchRow ( stmt ) ) {
-        acount = SQL_FetchInt ( stmt, 0 );
-    }
-    
-    if ( stmt != null ) {
-        delete stmt;
-    }
-
-    if ( acount > 0 ) {
-        return true;
-    }
-    return false;
+    return ( StrContains ( adminstr, authid, false ) != -1 );
 }
  
 public bool stringContains ( char string[32], char match[32] ) {
@@ -186,7 +198,7 @@ public bool isValidSteamID ( char authid[32] ) {
 }
 
 public void addKnifeEvent ( char attacker_name[64], char attacker_authid[32], char victim_name[64], char victim_authid[32], int isAdmin ) {
-    databaseConnect ( )
+    checkConnection ( )
     DBStatement stmt;
     int points = (isAdmin?10:5);
     if ( ( stmt = SQL_PrepareQuery ( knivhelg, "insert into event (stamp,attacker,attackerid,victim,victimid,points) values (now(),?,?,?,?,?)", error, sizeof(error) ) ) == null ) {
@@ -203,7 +215,9 @@ public void addKnifeEvent ( char attacker_name[64], char attacker_authid[32], ch
         SQL_GetError ( knivhelg, error, sizeof(error));
         PrintToServer("[OSKnivHelg]: Failed to query[0x02] (error: %s)", error);
     }
-    delete stmt;
+    if ( stmt != null ) {
+        delete stmt;
+    }
 }
  
 public void databaseConnect ( ) {
