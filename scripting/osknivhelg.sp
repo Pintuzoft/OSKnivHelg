@@ -152,6 +152,7 @@ public void fetchAdminStr ( ) {
     while ( ! SQL_FetchRow ( stmt ) ) {
         SQL_FetchString ( stmt, 0, buf, sizeof(buf) );
         adminstr = bufstr;
+        PrintToServer ( "[OSKnivHelg]: adminstr: %s", adminstr );
         Format ( bufstr, sizeof(bufstr), "%s;%s", adminstr, buf );
     } 
     adminstr = bufstr;
