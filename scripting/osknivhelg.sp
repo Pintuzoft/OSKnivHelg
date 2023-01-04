@@ -157,7 +157,6 @@ public void fetchAdminStr ( ) {
     if ( stmt != null ) {
         delete stmt;
     }
-    adminstr = buf;
 }
 
 public void fixPoints ( char name[64], char authid[32], bool isAttacker, bool isAdmin ) {
