@@ -122,12 +122,13 @@ public Action Command_KnifeTop ( int client, int args ) {
         SQL_FetchString ( stmt, 1, sid, sizeof(sid) );
         points = SQL_FetchInt ( stmt, 2 );
         if ( StrContains ( steamid, sid, false ) ) {
-            PrintToChat ( client, "  \x04%d. \x05%s: %dp", i, name, points );
+            PrintToChat ( client, " \x04[OSKnivHelg]: \x05%d. %s: %dp", i, name, points );
         } else {
-            PrintToChat ( client, "  \x04%d. %s: %dp", i, name, points );
+            PrintToChat ( client, " \x04[OSKnivHelg]: %d. %s: %dp", i, name, points );
         }
         i++;
     }
+    PrintToChat ( client, " \x04[OSKnivHelg]: Full stats: https://oldswedes.se/knivhelg" );
     return Plugin_Handled;
 }
 
@@ -189,8 +190,6 @@ public void fixPoints ( char name[64], char authid[32], bool isAttacker, bool is
 
 public bool isPlayerAdmin ( char authid[32] ) {
     ReplaceString ( authid, sizeof(authid), "STEAM_0", "STEAM_1" );
-    PrintToServer ( "[OSKnivHelg]: isPlayerAdmin: %s", authid );
-    PrintToServer ( "[OSKnivHelg]: - : %s", adminstr );
     return ( StrContains ( adminstr, authid, false ) != -1 );
 }
  
