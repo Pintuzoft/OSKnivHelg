@@ -128,14 +128,13 @@ public Action Command_KnifeTop ( int client, int args ) {
         }
         i++;
     }
-    PrintToChatAll ( " \x04[OSKnivHelg]: adminstr: %s", adminstr );
     return Plugin_Handled;
 }
 
 /* METHODS */
  
 public void fetchAdminStr ( ) {
-    char buf[1024];
+    char buf[32];
     DBStatement stmt;
     if ( ( stmt = SQL_PrepareQuery ( knivhelg, "select steamid from admin;", error, sizeof(error) ) ) == null ) {
         SQL_GetError ( knivhelg, error, sizeof(error));
@@ -149,17 +148,12 @@ public void fetchAdminStr ( ) {
         return;
     }
 
-    if ( ! SQL_FetchRow ( stmt ) ) {
-        SQL_GetError ( knivhelg, error, sizeof(error));
-        PrintToServer("[OSKnivHelg]: Failed to prepare query[0x11] (error: %s)", error);
-    } else {
-        if ( SQL_FetchString ( stmt, 0, buf, sizeof(buf) ) < 0 ) {
-            SQL_GetError ( knivhelg, error, sizeof(error));
-            PrintToServer("[OSKnivHelg]: Failed to prepare query[0x12] (error: %s)", error);
-        } else {
-            PrintToServer("[OSKnivHelg]: Adminstr: %s", buf);
-        }
+    while ( ! SQL_FetchRow ( stmt ) ) {
+        SQL_FetchString ( stmt, 0, buf, sizeof(buf) );
+        Format ( adminstr, sizeof(adminstr), "%s;%s", adminstr, buf );
     } 
+
+    PrintToServer ( "[OSKnivHelg]: adminstr: %s", adminstr );
 
     if ( stmt != null ) {
         delete stmt;
