@@ -148,7 +148,7 @@ public void fetchAdminStr ( ) {
         PrintToServer("[OSKnivHelg]: Failed to query[0x10] (error: %s)", error);
         return;
     }
-
+    adminstr = "";
     while ( SQL_FetchRow ( stmt ) ) {
         SQL_FetchString ( stmt, 0, buf, sizeof(buf) );
         Format ( adminstr, sizeof(adminstr), "%s;%s", adminstr, buf );
@@ -198,15 +198,11 @@ public bool stringContains ( char string[32], char match[32] ) {
 }
 
 public bool isValidSteamID ( char authid[32] ) {
-    PrintToServer ( "[OSKnivHelg]: isValidSteamID: %s", authid );
     if ( stringContains ( authid, "STEAM_0" ) ) {
-        PrintToServer ( "[OSKnivHelg]: - 1: %s", authid );
         return true;
     } else if ( stringContains ( authid, "STEAM_1" ) ) {
-        PrintToServer ( "[OSKnivHelg]: - 2: %s", authid );
         return true;
     }
-    PrintToServer ( "[OSKnivHelg]: - 3: %s", authid );
     return false;
 }
 
