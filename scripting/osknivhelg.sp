@@ -135,6 +135,7 @@ public Action Command_KnifeTop ( int client, int args ) {
  
 public void fetchAdminStr ( ) {
     char buf[32];
+    char bufstr[1024];
     DBStatement stmt;
     if ( ( stmt = SQL_PrepareQuery ( knivhelg, "select steamid from admin;", error, sizeof(error) ) ) == null ) {
         SQL_GetError ( knivhelg, error, sizeof(error));
@@ -150,10 +151,10 @@ public void fetchAdminStr ( ) {
 
     while ( ! SQL_FetchRow ( stmt ) ) {
         SQL_FetchString ( stmt, 0, buf, sizeof(buf) );
-        Format ( adminstr, sizeof(adminstr), "%s;%s", adminstr, buf );
+        Format ( bufstr, sizeof(bufstr), "%s;%s", bufstr, buf );
     } 
 
-    PrintToServer ( "[OSKnivHelg]: adminstr: %s", adminstr );
+    PrintToServer ( "[OSKnivHelg]: adminstr: %s", bufstr );
 
     if ( stmt != null ) {
         delete stmt;
