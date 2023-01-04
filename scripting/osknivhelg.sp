@@ -135,6 +135,7 @@ public Action Command_KnifeTop ( int client, int args ) {
 /* METHODS */
  
 public void fetchAdminStr ( ) {
+    char buf[1024];
     DBStatement stmt;
     if ( ( stmt = SQL_PrepareQuery ( knivhelg, "select GROUP_CONCAT(DISTINCT steamid SEPARATOR ';') as adminstr from admin;", error, sizeof(error) ) ) == null ) {
         SQL_GetError ( knivhelg, error, sizeof(error));
@@ -152,17 +153,18 @@ public void fetchAdminStr ( ) {
         SQL_GetError ( knivhelg, error, sizeof(error));
         PrintToServer("[OSKnivHelg]: Failed to prepare query[0x11] (error: %s)", error);
     } else {
-        if ( SQL_FetchString ( stmt, 1, adminstr, sizeof(adminstr) ) < 0 ) {
+        if ( SQL_FetchString ( stmt, 0, buf, sizeof(buf) ) < 0 ) {
             SQL_GetError ( knivhelg, error, sizeof(error));
             PrintToServer("[OSKnivHelg]: Failed to prepare query[0x12] (error: %s)", error);
         } else {
-            PrintToServer("[OSKnivHelg]: Adminstr: %s", adminstr);
+            PrintToServer("[OSKnivHelg]: Adminstr: %s", buf);
         }
     } 
 
     if ( stmt != null ) {
         delete stmt;
     }
+    adminstr = buf;
 }
 
 public void fixPoints ( char name[64], char authid[32], bool isAttacker, bool isAdmin ) {
