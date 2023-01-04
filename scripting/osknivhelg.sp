@@ -151,10 +151,11 @@ public void fetchAdminStr ( ) {
 
     while ( ! SQL_FetchRow ( stmt ) ) {
         SQL_FetchString ( stmt, 0, buf, sizeof(buf) );
-        Format ( bufstr, sizeof(bufstr), "%s;%s", bufstr, buf );
+        adminstr = bufstr;
+        Format ( bufstr, sizeof(bufstr), "%s;%s", adminstr, buf );
     } 
-
-    PrintToServer ( "[OSKnivHelg]: adminstr: %s", bufstr );
+    adminstr = bufstr;
+    PrintToServer ( "[OSKnivHelg]: adminstr: %s", adminstr );
 
     if ( stmt != null ) {
         delete stmt;
