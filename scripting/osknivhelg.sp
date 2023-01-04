@@ -122,9 +122,9 @@ public Action Command_KnifeTop ( int client, int args ) {
         SQL_FetchString ( stmt, 1, sid, sizeof(sid) );
         points = SQL_FetchInt ( stmt, 2 );
         if ( StrContains ( steamid, sid, false ) ) {
-            PrintToChat ( client, " \x04[OSKnivHelg]: \x05%d. %s: %dp", i, name, points );
-        } else {
             PrintToChat ( client, " \x04[OSKnivHelg]: %d. %s: %dp", i, name, points );
+        } else {
+            PrintToChat ( client, " \x04[OSKnivHelg]: \x09%d. %s: %dp", i, name, points );
         }
         i++;
     }
@@ -199,10 +199,10 @@ public bool stringContains ( char string[32], char match[32] ) {
 
 public bool isValidSteamID ( char authid[32] ) {
     PrintToServer ( "[OSKnivHelg]: isValidSteamID: %s", authid );
-    if ( StrContains ( authid, "STEAM_0", false ) ) {
+    if ( stringContains ( authid, "STEAM_0" ) ) {
         PrintToServer ( "[OSKnivHelg]: - 1: %s", authid );
         return true;
-    } else if ( StrContains ( authid, "STEAM_1", false ) ) {
+    } else if ( stringContains ( authid, "STEAM_1" ) ) {
         PrintToServer ( "[OSKnivHelg]: - 2: %s", authid );
         return true;
     }
