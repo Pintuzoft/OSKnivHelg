@@ -122,9 +122,9 @@ public Action Command_KnifeTop ( int client, int args ) {
         SQL_FetchString ( stmt, 1, sid, sizeof(sid) );
         points = SQL_FetchInt ( stmt, 2 );
         if ( StrContains ( steamid, sid, false ) ) {
-            PrintToChat ( client, "  \x05%d. %s %dp", i, name, points );
+            PrintToChat ( client, "  \x05%d. %s: %dp", i, name, points );
         } else {
-            PrintToChat ( client, "  \x04%d. %s %dp", i, name, points );
+            PrintToChat ( client, "  \x04%d. %s: %dp", i, name, points );
         }
         i++;
     }
