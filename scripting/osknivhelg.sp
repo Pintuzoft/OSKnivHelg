@@ -40,7 +40,6 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
     char weapon[32];
     bool isAttackerAdmin;
     bool isVictimAdmin;
-    bool isAdmin;
 
     if ( ! playerIsReal ( victim ) || 
          ! playerIsReal ( attacker ) ||
@@ -70,20 +69,19 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
 
     isAttackerAdmin = isPlayerAdmin ( attacker_authid );
     isVictimAdmin = isPlayerAdmin ( victim_authid );
-    isAdmin = ( isAttackerAdmin || isVictimAdmin );
 
-    addKnifeEvent ( attacker_name, attacker_authid, victim_name, victim_authid, isAdmin );
-    incPoints ( attacker_name, attacker_authid, isAdmin );
-    decPoints ( victim_name, victim_authid, isAdmin );
+    addKnifeEvent ( attacker_name, attacker_authid, victim_name, victim_authid, isVictimAdmin );
+    incPoints ( attacker_name, attacker_authid, isVictimAdmin );
+    decPoints ( victim_name, victim_authid, isVictimAdmin );
     
     if ( isAttackerAdmin && isVictimAdmin ) {
-        PrintToChatAll ( " \x02[OSKnivHelg]: %s (admin) knifed %s (admin) and got %d points!", attacker_name, victim_name, (isAdmin?10:5));
-    } else if ( isAttackerAdmin ) {
-        PrintToChatAll ( " \x02[OSKnivHelg]: %s (admin) knifed %s and got %d points!", attacker_name, victim_name, (isAdmin?10:5));
+        PrintToChatAll ( " \x02[OSKnivHelg]: %s (admin) knifed %s (admin) and got %d points!", attacker_name, victim_name, 10 );
     } else if ( isVictimAdmin ) {
-        PrintToChatAll ( " \x02[OSKnivHelg]: %s knifed %s (admin) and got %d points!", attacker_name, victim_name, (isAdmin?10:5));
+        PrintToChatAll ( " \x02[OSKnivHelg]: %s knifed %s (admin) and got %d points!", attacker_name, victim_name, 10 );
+    } else if ( isAttackerAdmin ) {
+        PrintToChatAll ( " \x02[OSKnivHelg]: %s (admin) knifed %s and got %d points!", attacker_name, victim_name, 5 );
     } else {
-        PrintToChatAll ( " \x02[OSKnivHelg]: %s knifed %s and got %d points!", attacker_name, victim_name, (isAdmin?10:5));
+        PrintToChatAll ( " \x02[OSKnivHelg]: %s knifed %s and got %d points!", attacker_name, victim_name, 5 );
     }
 }
 
@@ -160,11 +158,11 @@ public void fetchAdminStr ( ) {
     }
 }
 
-public void incPoints ( char name[64], char authid[32], bool isAdmin ) {
+public void incPoints ( char name[64], char authid[32], bool isVictimAdmin ) {
     checkConnection ();
     char query[255];
     DBStatement stmt;
-    int points = (isAdmin?10:5);
+    int points = (isVictimAdmin?10:5);
         
     Format ( query, sizeof(query), "insert into userstats (name,steamid,points) values (?,?,?) on duplicate key update points = points + ?;" );
     if ( ( stmt = SQL_PrepareQuery ( knivhelg, query, error, sizeof(error) ) ) == null ) {
@@ -187,11 +185,11 @@ public void incPoints ( char name[64], char authid[32], bool isAdmin ) {
         delete stmt;
     }
 }
-public void decPoints ( char name[64], char authid[32], bool isAdmin ) {
+public void decPoints ( char name[64], char authid[32], bool isVictimAdmin ) {
     checkConnection ();
     char query[255];
     DBStatement stmt;
-    int points = (isAdmin?10:5);
+    int points = (isVictimAdmin?10:5);
          
     Format ( query, sizeof(query), "insert into userstats (name,steamid,points) values (?,?,?) on duplicate key update points = points - ?;" );
     if ( ( stmt = SQL_PrepareQuery ( knivhelg, query, error, sizeof(error) ) ) == null ) {
