@@ -165,8 +165,14 @@ public void fixPoints ( char name[64], char authid[32], bool isAttacker, bool is
     char query[255];
     DBStatement stmt;
     int points = (isAdmin?10:5);
+    char incdec[4];
+    if ( isAttacker ) {
+        incdec = "+";
+    } else {
+        incdec = "-";
+    } 
     
-    Format ( query, sizeof(query), "insert into userstats (name,steamid,points) values (?,?,?) on duplicate key update points = points %s ?;", (isAttacker?"+":"-") );
+    Format ( query, sizeof(query), "insert into userstats (name,steamid,points) values (?,?,?) on duplicate key update points = points %s ?;", incdec );
     if ( ( stmt = SQL_PrepareQuery ( knivhelg, query, error, sizeof(error) ) ) == null ) {
         SQL_GetError ( knivhelg, error, sizeof(error));
         PrintToServer("[OSKnivHelg]: Failed to prepare query[0x02] (error: %s)", error);
