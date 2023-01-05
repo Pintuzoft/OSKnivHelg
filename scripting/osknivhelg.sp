@@ -73,8 +73,8 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
     isAdmin = ( isAttackerAdmin || isVictimAdmin );
 
     addKnifeEvent ( attacker_name, attacker_authid, victim_name, victim_authid, isAdmin );
-    fixPoints ( attacker_name, attacker_authid, true, isAdmin );
-    fixPoints ( victim_name, victim_authid, false, isAdmin );
+    incPoints ( attacker_name, attacker_authid, isAdmin );
+    decPoints ( victim_name, victim_authid, isAdmin );
     
     if ( isAttackerAdmin && isVictimAdmin ) {
         PrintToChatAll ( " \x02[OSKnivHelg]: %s (admin) knifed %s (admin) and got %d points!", attacker_name, victim_name, (isAdmin?10:5));
@@ -160,19 +160,40 @@ public void fetchAdminStr ( ) {
     }
 }
 
-public void fixPoints ( char name[64], char authid[32], bool isAttacker, bool isAdmin ) {
+public void incPoints ( char name[64], char authid[32], bool isAdmin ) {
     checkConnection ();
     char query[255];
     DBStatement stmt;
     int points = (isAdmin?10:5);
-    char incdec[4];
-    if ( isAttacker ) {
-        incdec = "+";
-    } else {
-        incdec = "-";
-    } 
-    
-    Format ( query, sizeof(query), "insert into userstats (name,steamid,points) values (?,?,?) on duplicate key update points = points %s ?;", incdec );
+        
+    Format ( query, sizeof(query), "insert into userstats (name,steamid,points) values (?,?,?) on duplicate key update points = points + ?;" );
+    if ( ( stmt = SQL_PrepareQuery ( knivhelg, query, error, sizeof(error) ) ) == null ) {
+        SQL_GetError ( knivhelg, error, sizeof(error));
+        PrintToServer("[OSKnivHelg]: Failed to prepare query[0x02] (error: %s)", error);
+        return;
+    }
+    SQL_BindParamString ( stmt, 0, name, false );
+    SQL_BindParamString ( stmt, 1, authid, false );
+    SQL_BindParamInt ( stmt, 2, points );
+    SQL_BindParamInt ( stmt, 3, points );
+
+    if ( ! SQL_Execute ( stmt ) ) {
+        SQL_GetError ( knivhelg, error, sizeof(error));
+        PrintToServer("[OSKnivHelg]: Failed to query[0x03] (error: %s)", error);
+        return;
+    }
+
+    if ( stmt != null ) {
+        delete stmt;
+    }
+}
+public void decPoints ( char name[64], char authid[32], bool isAdmin ) {
+    checkConnection ();
+    char query[255];
+    DBStatement stmt;
+    int points = (isAdmin?10:5);
+         
+    Format ( query, sizeof(query), "insert into userstats (name,steamid,points) values (?,?,?) on duplicate key update points = points - ?;" );
     if ( ( stmt = SQL_PrepareQuery ( knivhelg, query, error, sizeof(error) ) ) == null ) {
         SQL_GetError ( knivhelg, error, sizeof(error));
         PrintToServer("[OSKnivHelg]: Failed to prepare query[0x02] (error: %s)", error);
