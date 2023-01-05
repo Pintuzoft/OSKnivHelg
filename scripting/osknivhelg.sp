@@ -199,7 +199,7 @@ public void decPoints ( char name[64], char authid[32], bool isVictimAdmin ) {
     }
     SQL_BindParamString ( stmt, 0, name, false );
     SQL_BindParamString ( stmt, 1, authid, false );
-    SQL_BindParamInt ( stmt, 2, points );
+    SQL_BindParamInt ( stmt, 2, -points );
     SQL_BindParamInt ( stmt, 3, points );
 
     if ( ! SQL_Execute ( stmt ) ) {
