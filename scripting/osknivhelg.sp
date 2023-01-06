@@ -270,7 +270,8 @@ public void checkConnection ( ) {
  
 /* return true if player is real */
 public bool playerIsReal ( int player ) {
-    return ( IsClientInGame ( player ) &&
+    return ( player > 0 &&
+             IsClientInGame ( player ) &&
              ! IsClientSourceTV ( player ) );
 }
 
