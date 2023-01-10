@@ -7,6 +7,8 @@ char adminstr[1024];
 char error[255];
 Handle knivhelg = null;
 
+ConVar adminPointsEnabled;
+
 public Plugin myinfo = {
 	name = "OSKnivHelg",
 	author = "Pintuz",
@@ -17,6 +19,7 @@ public Plugin myinfo = {
 
 public void OnPluginStart ( ) {
     HookEvent ( "player_death", Event_PlayerDeath );
+    adminPointsEnabled = CreateConVar ( "osknivhelg_admin_points_enabled", "1", "Enable admin points" );
     RegConsoleCmd ( "sm_ktop", Command_KnifeTop, "Shows the top 10 knife kills" );
     AutoExecConfig ( true, "osknivhelg" );
 }
@@ -40,6 +43,7 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
     char weapon[32];
     bool isAttackerAdmin;
     bool isVictimAdmin;
+    int points = 5;
 
     if ( ! playerIsReal ( victim ) || 
          ! playerIsReal ( attacker ) ||
@@ -63,25 +67,30 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
     GetClientAuthId ( victim, AuthId_Steam2, victim_authid, sizeof ( victim_authid ) );
     GetClientAuthId ( attacker, AuthId_Steam2, attacker_authid, sizeof ( attacker_authid ) );
     
+ 
     if ( ! isValidSteamID ( victim_authid ) || ! isValidSteamID ( attacker_authid ) ) {
         return;
+    }
+
+    if ( adminPointsEnabled.BoolValue && isPlayerAdmin ( victim_authid ) ) {
+        points = 10;
     }
 
     isAttackerAdmin = isPlayerAdmin ( attacker_authid );
     isVictimAdmin = isPlayerAdmin ( victim_authid );
 
-    addKnifeEvent ( attacker_name, attacker_authid, victim_name, victim_authid, isVictimAdmin );
-    incPoints ( attacker_name, attacker_authid, isVictimAdmin );
-    decPoints ( victim_name, victim_authid, isVictimAdmin );
+    addKnifeEvent ( attacker_name, attacker_authid, victim_name, victim_authid, points );
+    incPoints ( attacker_name, attacker_authid, points );
+    decPoints ( victim_name, victim_authid, points );
     
     if ( isAttackerAdmin && isVictimAdmin ) {
-        PrintToChatAll ( " \x02[OSKnivHelg]: %s (admin) knifed %s (admin) and got %d points!", attacker_name, victim_name, 10 );
+        PrintToChatAll ( " \x02[OSKnivHelg]: %s (admin) knifed %s (admin) and got %d points!", attacker_name, victim_name, points );
     } else if ( isVictimAdmin ) {
-        PrintToChatAll ( " \x02[OSKnivHelg]: %s knifed %s (admin) and got %d points!", attacker_name, victim_name, 10 );
+        PrintToChatAll ( " \x02[OSKnivHelg]: %s knifed %s (admin) and got %d points!", attacker_name, victim_name, points );
     } else if ( isAttackerAdmin ) {
-        PrintToChatAll ( " \x02[OSKnivHelg]: %s (admin) knifed %s and got %d points!", attacker_name, victim_name, 5 );
+        PrintToChatAll ( " \x02[OSKnivHelg]: %s (admin) knifed %s and got %d points!", attacker_name, victim_name, points );
     } else {
-        PrintToChatAll ( " \x02[OSKnivHelg]: %s knifed %s and got %d points!", attacker_name, victim_name, 5 );
+        PrintToChatAll ( " \x02[OSKnivHelg]: %s knifed %s and got %d points!", attacker_name, victim_name, points );
     }
 }
 
@@ -158,11 +167,10 @@ public void fetchAdminStr ( ) {
     }
 }
 
-public void incPoints ( char name[64], char authid[32], bool isVictimAdmin ) {
+public void incPoints ( char name[64], char authid[32], int points ) {
     checkConnection ();
     char query[255];
     DBStatement stmt;
-    int points = (isVictimAdmin?10:5);
         
     Format ( query, sizeof(query), "insert into userstats (name,steamid,points) values (?,?,?) on duplicate key update points = points + ?;" );
     if ( ( stmt = SQL_PrepareQuery ( knivhelg, query, error, sizeof(error) ) ) == null ) {
@@ -185,11 +193,10 @@ public void incPoints ( char name[64], char authid[32], bool isVictimAdmin ) {
         delete stmt;
     }
 }
-public void decPoints ( char name[64], char authid[32], bool isVictimAdmin ) {
+public void decPoints ( char name[64], char authid[32], int points ) {
     checkConnection ();
     char query[255];
     DBStatement stmt;
-    int points = (isVictimAdmin?10:5);
          
     Format ( query, sizeof(query), "insert into userstats (name,steamid,points) values (?,?,?) on duplicate key update points = points - ?;" );
     if ( ( stmt = SQL_PrepareQuery ( knivhelg, query, error, sizeof(error) ) ) == null ) {
@@ -231,10 +238,9 @@ public bool isValidSteamID ( char authid[32] ) {
     return false;
 }
 
-public void addKnifeEvent ( char attacker_name[64], char attacker_authid[32], char victim_name[64], char victim_authid[32], int isAdmin ) {
+public void addKnifeEvent ( char attacker_name[64], char attacker_authid[32], char victim_name[64], char victim_authid[32], int points ) {
     checkConnection ( )
     DBStatement stmt;
-    int points = (isAdmin?10:5);
     if ( ( stmt = SQL_PrepareQuery ( knivhelg, "insert into event (stamp,attacker,attackerid,victim,victimid,points) values (now(),?,?,?,?,?)", error, sizeof(error) ) ) == null ) {
         SQL_GetError ( knivhelg, error, sizeof(error) );
         PrintToServer("[OSKnivHelg]: Failed to prepare query[0x01] (error: %s)", error);
