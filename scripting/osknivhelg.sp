@@ -43,6 +43,7 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
     char weapon[32];
     bool isAttackerAdmin;
     bool isVictimAdmin;
+    bool teamKill;
     int points = 5;
 
     if ( ! playerIsReal ( victim ) || 
@@ -72,6 +73,8 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
         return;
     }
 
+    teamKill = isTeamKill ( attacker, victim );
+
     if ( adminPointsEnabled.BoolValue && isPlayerAdmin ( victim_authid ) ) {
         points = 10;
     }
@@ -79,18 +82,34 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
     isAttackerAdmin = isPlayerAdmin ( attacker_authid );
     isVictimAdmin = isPlayerAdmin ( victim_authid );
 
-    addKnifeEvent ( attacker_name, attacker_authid, victim_name, victim_authid, points );
-    incPoints ( attacker_name, attacker_authid, points );
-    decPoints ( victim_name, victim_authid, points );
+
     
-    if ( isAttackerAdmin && isVictimAdmin ) {
-        PrintToChatAll ( " \x02[OSKnivHelg]: %s (admin) knifed %s (admin) and got %d points!", attacker_name, victim_name, points );
-    } else if ( isVictimAdmin ) {
-        PrintToChatAll ( " \x02[OSKnivHelg]: %s knifed %s (admin) and got %d points!", attacker_name, victim_name, points );
-    } else if ( isAttackerAdmin ) {
-        PrintToChatAll ( " \x02[OSKnivHelg]: %s (admin) knifed %s and got %d points!", attacker_name, victim_name, points );
+    if ( teamKill ) {
+        addKnifeEvent ( attacker_name, attacker_authid, victim_name, victim_authid, -points );
+        incPoints ( victim_name, victim_authid, points );
+        decPoints ( attacker_name, attacker_authid, points );
+        if ( isAttackerAdmin && isVictimAdmin ) {
+            PrintToChatAll ( " \x02[OSKnivHelg]: %s (admin) knifed teammate %s (admin) and got -%d points!", attacker_name, victim_name, points );
+        } else if ( isVictimAdmin ) {
+            PrintToChatAll ( " \x02[OSKnivHelg]: %s knifed teammate %s (admin) and got -%d points!", attacker_name, victim_name, points );
+        } else if ( isAttackerAdmin ) {
+            PrintToChatAll ( " \x02[OSKnivHelg]: %s (admin) knifed teammate %s and got -%d points!", attacker_name, victim_name, points );
+        } else {
+            PrintToChatAll ( " \x02[OSKnivHelg]: %s knifed teammate %s and got -%d points!", attacker_name, victim_name, points );
+        }
     } else {
-        PrintToChatAll ( " \x02[OSKnivHelg]: %s knifed %s and got %d points!", attacker_name, victim_name, points );
+        addKnifeEvent ( attacker_name, attacker_authid, victim_name, victim_authid, points );
+        incPoints ( attacker_name, attacker_authid, points );
+        decPoints ( victim_name, victim_authid, points );
+        if ( isAttackerAdmin && isVictimAdmin ) {
+            PrintToChatAll ( " \x02[OSKnivHelg]: %s (admin) knifed %s (admin) and got %d points!", attacker_name, victim_name, points );
+        } else if ( isVictimAdmin ) {
+            PrintToChatAll ( " \x02[OSKnivHelg]: %s knifed %s (admin) and got %d points!", attacker_name, victim_name, points );
+        } else if ( isAttackerAdmin ) {
+            PrintToChatAll ( " \x02[OSKnivHelg]: %s (admin) knifed %s and got %d points!", attacker_name, victim_name, points );
+        } else {
+            PrintToChatAll ( " \x02[OSKnivHelg]: %s knifed %s and got %d points!", attacker_name, victim_name, points );
+        }
     }
 }
 
@@ -274,6 +293,14 @@ public void checkConnection ( ) {
     }
 }
  
+/* IS TEAMKILL */
+public bool isTeamKill ( int attacker, int victim ) {
+    if ( GetClientTeam ( attacker ) == GetClientTeam ( victim ) ) {
+        return true;
+    }
+    return false;
+}
+
 /* return true if player is real */
 public bool playerIsReal ( int player ) {
     return ( player > 0 &&
