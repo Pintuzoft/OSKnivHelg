@@ -69,9 +69,9 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
     GetClientAuthId ( attacker, AuthId_Steam2, attacker_authid, sizeof ( attacker_authid ) );
     
  
-    if ( ! isValidSteamID ( victim_authid ) || ! isValidSteamID ( attacker_authid ) ) {
-        return;
-    }
+    //if ( ! isValidSteamID ( victim_authid ) || ! isValidSteamID ( attacker_authid ) ) {
+    //    return;
+    //}
 
     teamKill = isTeamKill ( attacker, victim );
 
@@ -86,8 +86,8 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
     
     if ( teamKill ) {
         addKnifeEvent ( attacker_name, attacker_authid, victim_name, victim_authid, -points );
-        incPoints ( victim_name, victim_authid, points );
-        decPoints ( attacker_name, attacker_authid, points );
+        fixPoints ( victim_name, victim_authid, true, points );
+        fixPoints ( attacker_name, attacker_authid, false, points );
         if ( isAttackerAdmin && isVictimAdmin ) {
             PrintToChatAll ( " \x02[OSKnivHelg]: %s (admin) knifed teammate %s (admin) and got -%d points!", attacker_name, victim_name, points );
         } else if ( isVictimAdmin ) {
@@ -99,8 +99,8 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
         }
     } else {
         addKnifeEvent ( attacker_name, attacker_authid, victim_name, victim_authid, points );
-        incPoints ( attacker_name, attacker_authid, points );
-        decPoints ( victim_name, victim_authid, points );
+        fixPoints ( attacker_name, attacker_authid, true, points );
+        fixPoints ( victim_name, victim_authid, false, points );
         if ( isAttackerAdmin && isVictimAdmin ) {
             PrintToChatAll ( " \x02[OSKnivHelg]: %s (admin) knifed %s (admin) and got %d points!", attacker_name, victim_name, points );
         } else if ( isVictimAdmin ) {
@@ -186,12 +186,15 @@ public void fetchAdminStr ( ) {
     }
 }
 
-public void incPoints ( char name[64], char authid[32], int points ) {
+public void fixPoints ( char name[64], char authid[32], bool increase, int points ) {
     checkConnection ();
     char query[255];
     DBStatement stmt;
-        
-    Format ( query, sizeof(query), "insert into userstats (name,steamid,points) values (?,?,?) on duplicate key update points = points + ?;" );
+    if ( increase ) {
+        Format ( query, sizeof(query), "insert into userstats (name,steamid,points) values (?,?,?) on duplicate key update points = points + ?;" );
+    } else {
+        Format ( query, sizeof(query), "insert into userstats (name,steamid,points) values (?,?,?) on duplicate key update points = points - ?;" );
+    }
     if ( ( stmt = SQL_PrepareQuery ( knivhelg, query, error, sizeof(error) ) ) == null ) {
         SQL_GetError ( knivhelg, error, sizeof(error));
         PrintToServer("[OSKnivHelg]: Failed to prepare query[0x02] (error: %s)", error);
@@ -199,7 +202,11 @@ public void incPoints ( char name[64], char authid[32], int points ) {
     }
     SQL_BindParamString ( stmt, 0, name, false );
     SQL_BindParamString ( stmt, 1, authid, false );
-    SQL_BindParamInt ( stmt, 2, points );
+    if ( increase ) {
+        SQL_BindParamInt ( stmt, 2, points );
+    } else {
+        SQL_BindParamInt ( stmt, 2, -points );
+    }
     SQL_BindParamInt ( stmt, 3, points );
 
     if ( ! SQL_Execute ( stmt ) ) {
@@ -207,36 +214,10 @@ public void incPoints ( char name[64], char authid[32], int points ) {
         PrintToServer("[OSKnivHelg]: Failed to query[0x03] (error: %s)", error);
         return;
     }
-
     if ( stmt != null ) {
         delete stmt;
     }
-}
-public void decPoints ( char name[64], char authid[32], int points ) {
-    checkConnection ();
-    char query[255];
-    DBStatement stmt;
-         
-    Format ( query, sizeof(query), "insert into userstats (name,steamid,points) values (?,?,?) on duplicate key update points = points - ?;" );
-    if ( ( stmt = SQL_PrepareQuery ( knivhelg, query, error, sizeof(error) ) ) == null ) {
-        SQL_GetError ( knivhelg, error, sizeof(error));
-        PrintToServer("[OSKnivHelg]: Failed to prepare query[0x02] (error: %s)", error);
-        return;
-    }
-    SQL_BindParamString ( stmt, 0, name, false );
-    SQL_BindParamString ( stmt, 1, authid, false );
-    SQL_BindParamInt ( stmt, 2, -points );
-    SQL_BindParamInt ( stmt, 3, points );
 
-    if ( ! SQL_Execute ( stmt ) ) {
-        SQL_GetError ( knivhelg, error, sizeof(error));
-        PrintToServer("[OSKnivHelg]: Failed to query[0x03] (error: %s)", error);
-        return;
-    }
-
-    if ( stmt != null ) {
-        delete stmt;
-    }
 }
 
 public bool isPlayerAdmin ( char authid[32] ) {
