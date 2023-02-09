@@ -89,26 +89,26 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
         fixPoints ( victim_name, victim_authid, true, points );
         fixPoints ( attacker_name, attacker_authid, false, points );
         if ( isAttackerAdmin && isVictimAdmin ) {
-            PrintToChatAll ( " \x02[OSKnivHelg]: %s (admin) knifed teammate %s (admin) and got -%d points!", attacker_name, victim_name, points );
+            PrintToChatAll ( " \x04[OSKnivHelg]\x01: \x06%s \x08(admin) \x01knifed teammate \x07%s \x08(admin) \x01and got \x07-%d points!", attacker_name, victim_name, points );
         } else if ( isVictimAdmin ) {
-            PrintToChatAll ( " \x02[OSKnivHelg]: %s knifed teammate %s (admin) and got -%d points!", attacker_name, victim_name, points );
+            PrintToChatAll ( " \x04[OSKnivHelg]\x01: \x06%s \x01knifed teammate \x07%s \x08(admin) \x01and got \x07-%d points!", attacker_name, victim_name, points );
         } else if ( isAttackerAdmin ) {
-            PrintToChatAll ( " \x02[OSKnivHelg]: %s (admin) knifed teammate %s and got -%d points!", attacker_name, victim_name, points );
+            PrintToChatAll ( " \x04[OSKnivHelg]\x01: \x06%s \x08(admin) \x01knifed teammate \x07%s \x01and got \x07-%d points!", attacker_name, victim_name, points );
         } else {
-            PrintToChatAll ( " \x02[OSKnivHelg]: %s knifed teammate %s and got -%d points!", attacker_name, victim_name, points );
+            PrintToChatAll ( " \x04[OSKnivHelg]\x01: \x06%s \x01knifed teammate \x07%s \x01and got \x07-%d points!", attacker_name, victim_name, points );
         }
     } else {
         addKnifeEvent ( attacker_name, attacker_authid, victim_name, victim_authid, points );
         fixPoints ( attacker_name, attacker_authid, true, points );
         fixPoints ( victim_name, victim_authid, false, points );
         if ( isAttackerAdmin && isVictimAdmin ) {
-            PrintToChatAll ( " \x02[OSKnivHelg]: %s (admin) knifed %s (admin) and got %d points!", attacker_name, victim_name, points );
+            PrintToChatAll ( " \x04[OSKnivHelg]\x01: \x06%s \x08(admin) \x01knifed \x07%s \x08(admin) \x01and got \x04%d points!", attacker_name, victim_name, points );
         } else if ( isVictimAdmin ) {
-            PrintToChatAll ( " \x02[OSKnivHelg]: %s knifed %s (admin) and got %d points!", attacker_name, victim_name, points );
+            PrintToChatAll ( " \x04[OSKnivHelg]\x01: \x06%s \x01knifed \x07%s \x08(admin) \x01and got \x04%d points!", attacker_name, victim_name, points );
         } else if ( isAttackerAdmin ) {
-            PrintToChatAll ( " \x02[OSKnivHelg]: %s (admin) knifed %s and got %d points!", attacker_name, victim_name, points );
+            PrintToChatAll ( " \x04[OSKnivHelg]\x01: \x06%s \x08(admin) \x01knifed \x07%s \x01and got \x04%d points!", attacker_name, victim_name, points );
         } else {
-            PrintToChatAll ( " \x02[OSKnivHelg]: %s knifed %s and got %d points!", attacker_name, victim_name, points );
+            PrintToChatAll ( " \x04[OSKnivHelg]\x01: \x06%s \x01knifed \x07%s \x01and got \x04%d points!", attacker_name, victim_name, points );
         }
     }
 }
