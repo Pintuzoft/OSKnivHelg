@@ -82,34 +82,16 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
     isAttackerAdmin = isPlayerAdmin ( attacker_authid );
     isVictimAdmin = isPlayerAdmin ( victim_authid );
 
-
-    
     if ( teamKill ) {
-        addKnifeEvent ( attacker_name, attacker_authid, victim_name, victim_authid, -points );
+        addKnifeEvent ( attacker_name, attacker_authid, victim_name, victim_authid, points, 1 );
         fixPoints ( victim_name, victim_authid, true, points );
         fixPoints ( attacker_name, attacker_authid, false, points );
-        if ( isAttackerAdmin && isVictimAdmin ) {
-            PrintToChatAll ( " \x04[OSKnivHelg]\x01: \x06%s \x08(admin) \x01knifed teammate \x07%s \x08(admin) \x01and got \x07-%d points!", attacker_name, victim_name, points );
-        } else if ( isVictimAdmin ) {
-            PrintToChatAll ( " \x04[OSKnivHelg]\x01: \x06%s \x01knifed teammate \x07%s \x08(admin) \x01and got \x07-%d points!", attacker_name, victim_name, points );
-        } else if ( isAttackerAdmin ) {
-            PrintToChatAll ( " \x04[OSKnivHelg]\x01: \x06%s \x08(admin) \x01knifed teammate \x07%s \x01and got \x07-%d points!", attacker_name, victim_name, points );
-        } else {
-            PrintToChatAll ( " \x04[OSKnivHelg]\x01: \x06%s \x01knifed teammate \x07%s \x01and got \x07-%d points!", attacker_name, victim_name, points );
-        }
+        PrintToChatCustomTK ( attacker_name, isAttackerAdmin, victim_name, isVictimAdmin, points );
+        
     } else {
-        addKnifeEvent ( attacker_name, attacker_authid, victim_name, victim_authid, points );
+        addKnifeEvent ( attacker_name, attacker_authid, victim_name, victim_authid, points, 0 );
         fixPoints ( attacker_name, attacker_authid, true, points );
-        fixPoints ( victim_name, victim_authid, false, points );
-        if ( isAttackerAdmin && isVictimAdmin ) {
-            PrintToChatAll ( " \x04[OSKnivHelg]\x01: \x06%s \x08(admin) \x01knifed \x07%s \x08(admin) \x01and got \x04%d points!", attacker_name, victim_name, points );
-        } else if ( isVictimAdmin ) {
-            PrintToChatAll ( " \x04[OSKnivHelg]\x01: \x06%s \x01knifed \x07%s \x08(admin) \x01and got \x04%d points!", attacker_name, victim_name, points );
-        } else if ( isAttackerAdmin ) {
-            PrintToChatAll ( " \x04[OSKnivHelg]\x01: \x06%s \x08(admin) \x01knifed \x07%s \x01and got \x04%d points!", attacker_name, victim_name, points );
-        } else {
-            PrintToChatAll ( " \x04[OSKnivHelg]\x01: \x06%s \x01knifed \x07%s \x01and got \x04%d points!", attacker_name, victim_name, points );
-        }
+        PrintToChatCustom ( attacker_name, isAttackerAdmin, victim_name, isVictimAdmin, points );
     }
 }
 
@@ -160,6 +142,42 @@ public Action Command_KnifeTop ( int client, int args ) {
 
 /* METHODS */
  
+
+public void PrintToChatCustom ( char attacker[64], bool isAttackerAdmin, char victim[64], bool isVictimAdmin, int points ) {
+    char aAdmin[16];
+    char vAdmin[16];
+    if ( isAttackerAdmin ) {
+        aAdmin = "\x08(admin) ";
+    } else {
+        aAdmin = "";
+    }
+
+    if ( isVictimAdmin ) {
+        vAdmin = "\x08(admin) ";
+    } else {
+        vAdmin = "";
+    }
+    PrintToChatAll ( " \x04[OSKnivHelg]\x01: \x06%s %s\x01(%dp) knifed \x07%s %s", attacker, aAdmin, points, victim, vAdmin );
+}
+
+public void PrintToChatCustomTK ( char attacker[64], bool isAttackerAdmin, char victim[64], bool isVictimAdmin, int points ) {
+    char aAdmin[16];
+    char vAdmin[16];
+    if ( isAttackerAdmin ) {
+        aAdmin = "\x08(admin) ";
+    } else {
+        aAdmin = "";
+    }
+
+    if ( isVictimAdmin ) {
+        vAdmin = "\x08(admin) ";
+    } else {
+        vAdmin = "";
+    }
+    PrintToChatAll ( " \x04[OSKnivHelg]\x01: \x07%s %s\x01(-%dp) knife-TeamKilled \x06%s %s \x01(%dp)", attacker, aAdmin, points, victim, vAdmin, points );
+}
+
+
 public void fetchAdminStr ( ) {
     char buf[32];
     DBStatement stmt;
@@ -238,10 +256,10 @@ public bool isValidSteamID ( char authid[32] ) {
     return false;
 }
 
-public void addKnifeEvent ( char attacker_name[64], char attacker_authid[32], char victim_name[64], char victim_authid[32], int points ) {
+public void addKnifeEvent ( char attacker_name[64], char attacker_authid[32], char victim_name[64], char victim_authid[32], int points, int type ) {
     checkConnection ( )
     DBStatement stmt;
-    if ( ( stmt = SQL_PrepareQuery ( knivhelg, "insert into event (stamp,attacker,attackerid,victim,victimid,points) values (now(),?,?,?,?,?)", error, sizeof(error) ) ) == null ) {
+    if ( ( stmt = SQL_PrepareQuery ( knivhelg, "insert into event (stamp,attacker,attackerid,victim,victimid,points,type) values (now(),?,?,?,?,?,?)", error, sizeof(error) ) ) == null ) {
         SQL_GetError ( knivhelg, error, sizeof(error) );
         PrintToServer("[OSKnivHelg]: Failed to prepare query[0x01] (error: %s)", error);
         return;
@@ -251,6 +269,7 @@ public void addKnifeEvent ( char attacker_name[64], char attacker_authid[32], ch
     SQL_BindParamString ( stmt, 2, victim_name, false );
     SQL_BindParamString ( stmt, 3, victim_authid, false );
     SQL_BindParamInt ( stmt, 4, points );
+    SQL_BindParamInt ( stmt, 5, type );
     if ( ! SQL_Execute ( stmt ) ) {
         SQL_GetError ( knivhelg, error, sizeof(error));
         PrintToServer("[OSKnivHelg]: Failed to query[0x02] (error: %s)", error);
