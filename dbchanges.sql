@@ -1,1 +1,0 @@
-alter table event add type int(11) default 0;
