@@ -82,17 +82,14 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
     isAttackerAdmin = isPlayerAdmin ( attacker_authid );
     isVictimAdmin = isPlayerAdmin ( victim_authid );
 
+    addKnifeEvent ( attacker_name, attacker_authid, victim_name, victim_authid, points, teamKill );
     if ( teamKill ) {
-        addKnifeEvent ( attacker_name, attacker_authid, victim_name, victim_authid, points, 1 );
         fixPoints ( victim_name, victim_authid, true, points );
-        fixPoints ( attacker_name, attacker_authid, false, points );
-        PrintToChatCustomTK ( attacker_name, isAttackerAdmin, victim_name, isVictimAdmin, points );
-        
+        fixPoints ( attacker_name, attacker_authid, false, points );        
     } else {
-        addKnifeEvent ( attacker_name, attacker_authid, victim_name, victim_authid, points, 0 );
         fixPoints ( attacker_name, attacker_authid, true, points );
-        PrintToChatCustom ( attacker_name, isAttackerAdmin, victim_name, isVictimAdmin, points );
     }
+    PrintToChatCustom ( attacker_name, isAttackerAdmin, victim_name, isVictimAdmin, points, teamKill );
 }
 
 
@@ -130,9 +127,9 @@ public Action Command_KnifeTop ( int client, int args ) {
         SQL_FetchString ( stmt, 1, sid, sizeof(sid) );
         points = SQL_FetchInt ( stmt, 2 );
         if ( StrContains ( steamid, sid, false ) ) {
-            PrintToChat ( client, " \x04[OSKnivHelg]: %d. %s: %dp", i, name, points );
+            PrintToChat ( client, " \x04- %d. %s: %dp", i, name, points );
         } else {
-            PrintToChat ( client, " \x04[OSKnivHelg]: \x09%d. %s: %dp", i, name, points );
+            PrintToChat ( client, " \x04- \x09%d. %s: %dp", i, name, points );
         }
         i++;
     }
@@ -143,7 +140,7 @@ public Action Command_KnifeTop ( int client, int args ) {
 /* METHODS */
  
 
-public void PrintToChatCustom ( char attacker[64], bool isAttackerAdmin, char victim[64], bool isVictimAdmin, int points ) {
+public void PrintToChatCustom ( char attacker[64], bool isAttackerAdmin, char victim[64], bool isVictimAdmin, int points, bool isTeamKill ) {
     char aAdmin[16];
     char vAdmin[16];
     if ( isAttackerAdmin ) {
@@ -157,26 +154,13 @@ public void PrintToChatCustom ( char attacker[64], bool isAttackerAdmin, char vi
     } else {
         vAdmin = "";
     }
-    PrintToChatAll ( " \x04[OSKnivHelg]\x01: \x06%s %s\x01(%dp) knifed \x07%s %s", attacker, aAdmin, points, victim, vAdmin );
-}
 
-public void PrintToChatCustomTK ( char attacker[64], bool isAttackerAdmin, char victim[64], bool isVictimAdmin, int points ) {
-    char aAdmin[16];
-    char vAdmin[16];
-    if ( isAttackerAdmin ) {
-        aAdmin = "\x08(admin) ";
-    } else {
-        aAdmin = "";
+    if ( isTeamKill ) {
+        PrintToChatAll ( " \x04[OSKnivHelg]\x01: \x07%s %s\x01(-%dp) knife-TeamKilled \x06%s %s \x01(%dp)", attacker, aAdmin, points, victim, vAdmin, points );        
+    } else { 
+        PrintToChatAll ( " \x04[OSKnivHelg]\x01: \x06%s %s\x01(%dp) knifed \x07%s %s", attacker, aAdmin, points, victim, vAdmin );
     }
-
-    if ( isVictimAdmin ) {
-        vAdmin = "\x08(admin) ";
-    } else {
-        vAdmin = "";
-    }
-    PrintToChatAll ( " \x04[OSKnivHelg]\x01: \x07%s %s\x01(-%dp) knife-TeamKilled \x06%s %s \x01(%dp)", attacker, aAdmin, points, victim, vAdmin, points );
 }
-
 
 public void fetchAdminStr ( ) {
     char buf[32];
@@ -256,7 +240,7 @@ public bool isValidSteamID ( char authid[32] ) {
     return false;
 }
 
-public void addKnifeEvent ( char attacker_name[64], char attacker_authid[32], char victim_name[64], char victim_authid[32], int points, int type ) {
+public void addKnifeEvent ( char attacker_name[64], char attacker_authid[32], char victim_name[64], char victim_authid[32], int points, bool isTeamKill ) {
     checkConnection ( )
     DBStatement stmt;
     if ( ( stmt = SQL_PrepareQuery ( knivhelg, "insert into event (stamp,attacker,attackerid,victim,victimid,points,type) values (now(),?,?,?,?,?,?)", error, sizeof(error) ) ) == null ) {
@@ -269,7 +253,11 @@ public void addKnifeEvent ( char attacker_name[64], char attacker_authid[32], ch
     SQL_BindParamString ( stmt, 2, victim_name, false );
     SQL_BindParamString ( stmt, 3, victim_authid, false );
     SQL_BindParamInt ( stmt, 4, points );
-    SQL_BindParamInt ( stmt, 5, type );
+    if ( isTeamKill ) {
+        SQL_BindParamInt ( stmt, 5, 1 );
+    } else {
+        SQL_BindParamInt ( stmt, 5, 0 );
+    }
     if ( ! SQL_Execute ( stmt ) ) {
         SQL_GetError ( knivhelg, error, sizeof(error));
         PrintToServer("[OSKnivHelg]: Failed to query[0x02] (error: %s)", error);
