@@ -13,7 +13,7 @@ public Plugin myinfo = {
 	name = "OSKnivHelg",
 	author = "Pintuz",
 	description = "OldSwedes Kniva en admin helg plugin",
-	version = "0.01",
+	version = "0.02",
 	url = "https://github.com/Pintuzoft/OSKnivHelg"
 }
 
@@ -69,9 +69,9 @@ public void Event_PlayerDeath ( Event event, const char[] name, bool dontBroadca
     GetClientAuthId ( attacker, AuthId_Steam2, attacker_authid, sizeof ( attacker_authid ) );
     
  
-    // if ( ! isValidSteamID ( victim_authid ) || ! isValidSteamID ( attacker_authid ) ) {
-    //     return;
-    // }
+    if ( ! isValidSteamID ( victim_authid ) || ! isValidSteamID ( attacker_authid ) ) {
+       return;
+    }
 
     teamKill = isTeamKill ( attacker, victim );
 
